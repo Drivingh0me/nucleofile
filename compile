@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Compile everything without making object files first, 
+# because that breaks gsl for som eunknown reason.
+gcc src/main.c src/math.c src/tui.c src/outFiles.c src/nucleofile.c target/macos/macos.c -o build/nucleofile -Wall -Wextra -lgsl -Iinclude -I/usr/local/include -L/usr/local/lib
