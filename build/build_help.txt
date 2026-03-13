@@ -1,0 +1,8 @@
+Macos/linux:
+	run "./compile" in terminal.
+
+Raspberry pi:
+	run "./compile" in shell.
+
+Windows:
+	Not supported.

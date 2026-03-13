@@ -1,5 +1,6 @@
 # ingore everything in the build directory.
 build/**
+!build/*.txt
 
 # ignore test directory.
 test/
