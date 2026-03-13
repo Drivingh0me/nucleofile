@@ -15,11 +15,12 @@ void run_tui(tuiRequest *request)
 
     printf("Term size is %d x %d \n", termRows, termCols);
 
+    req = malloc(1 * sizeof(unsigned char));
     req[0] = 0;
 
     request->numOfReq = 0;
     request->requests = req;
     request->numOfPaths = 0;
-    request->paths = 0;
+    request->paths = NULL;
     
 }
