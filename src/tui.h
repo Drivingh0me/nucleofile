@@ -5,7 +5,7 @@ typedef struct {
     unsigned short numOfReq;
     unsigned char *requests;
     unsigned short numOfPaths;
-    char **paths;
+    char *paths; /* paths are \n seperated */
 } tuiRequest;
 
 #define RESET "\033[0m"

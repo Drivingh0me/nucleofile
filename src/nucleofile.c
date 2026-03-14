@@ -32,6 +32,7 @@ typedef struct {
 static void cleanup()
 {
     printf("Cleaning up.\n");
+
 }
 
 void nucf_err(int errno)
