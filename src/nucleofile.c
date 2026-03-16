@@ -53,7 +53,7 @@ void nucf_err(int errno)
 static int parse_args(int argc, char **argv, tuiRequest *request)
 {
     if (argc == 1) {
-        run_tui(request);
+        request->runTui = 1;
     }
 
     if (argc > 1) {
@@ -110,6 +110,10 @@ int nucf_run_app(int argc, char **argv, nucfSystemInfo sysInfo)
     status = parse_args(argc, argv, &userCommand);
     if (status) {
         return status;
+    }
+
+    if (userCommand.runTui) {
+        run_tui(&userCommand);
     }
 
     status = nucf_coalesce_data(userCommand, &dataset);

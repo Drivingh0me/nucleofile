@@ -1,9 +1,30 @@
 #ifndef TUI_H
 #define TUI_H
 
+enum Command {
+    RUNTUI,
+    PLOT,
+    FITLINEAR
+};
+
+enum Tool {
+    COALESCE,
+    ANALYSIS
+};
+
 typedef struct {
+    double *arr;
+    unsigned int arrLen;
+} Data;
+
+typedef struct {
+    int (*func[2])(int);
+} Toolset;
+
+typedef struct {
+    unsigned char runTui;
     unsigned short numOfReq;
-    unsigned char *requests;
+    enum Command *requests;
     unsigned short numOfPaths;
     char *paths; /* paths are \n seperated */
 } tuiRequest;
