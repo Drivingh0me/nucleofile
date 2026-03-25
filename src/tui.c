@@ -5,7 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 
-int same_word(char* sample, char *key)
+void throw_err(int err)
+{
+    printf(REDBOLD "Error: %d" RESET, err);
+}
+
+static int same_word(char* sample, char *key)
 {
     int i = 0;
     while (key[i] != '\n') {
@@ -20,23 +25,22 @@ int same_word(char* sample, char *key)
     return 1;
 }
 
-void run_tui(tuiRequest *request)
+void run_tui(Toolset tools)
 {
     int termRows;
     int termCols;
 
-    int i = 0;
+    // enum Command req[12];
+    // unsigned short numReq = 0;
+    // char paths[20];
+    // unsigned short numPaths = 0;
 
-    enum Command req[12];
-    unsigned short numReq = 0;
-    char paths[20];
-    unsigned short numPaths = 0;
-
-    int tuiShouldRun = 1; /* 1 is no error */
-    char buffer[120];
+    int tuiShouldRun = 1;
+    char buffer[256];
     char *a;
+    int waste;
 
-    printf("nucleofile V0.1\n");
+    printf("nucleofile V0.1\nAngstrom interpreter running.\n");
     while (tuiShouldRun) {
         TARG_get_term_size(&termRows, &termCols);
         printf(BLUE "> " RESET);
@@ -49,10 +53,23 @@ void run_tui(tuiRequest *request)
         if (same_word(buffer, "quit\n")) {
             tuiShouldRun = 0;
         }
-    }
 
-    request->numOfReq = numReq;
-    request->requests = req;
-    request->numOfPaths = numPaths;
-    request->paths = paths;
+        if (same_word(buffer, "clear\n")) {
+            printf(CLEAR CURSOR_HOME);
+        }
+
+        if (same_word(buffer, "func1\n")) {
+            waste = tools.func[COALESCE](1);
+            if (waste) {
+                throw_err(waste);
+            }
+        }
+
+        if (same_word(buffer, "func2\n")) {
+            waste = tools.func[ANALYSIS](2);
+            if (waste) {
+                throw_err(waste);
+            }
+        }
+    }
 }

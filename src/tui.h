@@ -21,16 +21,9 @@ typedef struct {
     int (*func[2])(int);
 } Toolset;
 
-typedef struct {
-    unsigned char runTui;
-    unsigned short numOfReq;
-    enum Command *requests;
-    unsigned short numOfPaths;
-    char *paths; /* paths are \n seperated */
-} tuiRequest;
-
 #define RESET "\033[0m"
 #define CLEAR "\033[2J"
+#define CURSOR_HOME "\033[H"
 
 /* Foreground colors */
 #define BLACK "\033[30m"
@@ -44,6 +37,6 @@ typedef struct {
 #define COLOR256 "\033[38;5;%dm"
 #define REDBOLD "\033[1;31m"
 
-void run_tui(tuiRequest *request);
+void run_tui(Toolset tools);
 
 #endif /* TUI_H */

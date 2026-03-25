@@ -35,6 +35,18 @@ static void cleanup()
 
 }
 
+int function1(int a)
+{
+    printf("Function%d ran.\n", a);
+    return 0;
+}
+
+int function2(int a)
+{
+    printf("Function%d ran.\n", a);
+    return 0;
+}
+
 void nucf_err(int errno)
 {
     if (errno < 0) {
@@ -50,16 +62,18 @@ void nucf_err(int errno)
     }
 }
 
-static int parse_args(int argc, char **argv, tuiRequest *request)
+static int parse_args(int argc, char **argv, int *runTui)
 {
+    *runTui = 0;
     if (argc == 1) {
-        request->runTui = 1;
+        *runTui = 1;
     }
 
     if (argc > 1) {
         if (argv[2][0] == '-') {
-            request->requests[0] = 1;
-            request->numOfReq = 1;
+            if (argv[2][1] == 't') {
+                *runTui = 1;
+            }
         }
     }
 
@@ -88,7 +102,7 @@ static int nucf_run_analysis(nucfDataset data)
     return 0;
 }
 
-static int nucf_coalesce_data(tuiRequest request, nucfDataset *dataset)
+static int nucf_coalesce_data(nucfDataset *dataset)
 {
     printf("Coalescing data.\n");
 
@@ -104,27 +118,31 @@ int nucf_startup(nucfSystemInfo *sysInfo)
 int nucf_run_app(int argc, char **argv, nucfSystemInfo sysInfo)
 {
     int status = -1;
-    tuiRequest userCommand;
+    int runTui;
     nucfDataset dataset;
+    Toolset tools;
 
-    status = parse_args(argc, argv, &userCommand);
+    tools.func[COALESCE] = function1;
+    tools.func[ANALYSIS] = function2;
+
+    status = parse_args(argc, argv, &runTui);
     if (status) {
         return status;
     }
 
-    if (userCommand.runTui) {
-        run_tui(&userCommand);
+    if (runTui) {
+        run_tui(tools);
     }
 
-    status = nucf_coalesce_data(userCommand, &dataset);
-    if (status) {
-        return status;
-    }
-
-    status = nucf_run_analysis(dataset);
-    if (status) {
-        return status;
-    }
+    // status = nucf_coalesce_data(userCommand, &dataset);
+    // if (status) {
+    //     return status;
+    // }
+    //
+    // status = nucf_run_analysis(dataset);
+    // if (status) {
+    //     return status;
+    // }
 
     return 0;
 }
