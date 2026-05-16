@@ -21,6 +21,9 @@ typedef struct {
     int (*func[2])(int);
 } Toolset;
 
+/* Special case*/
+#define INT_NEWLN "\033[34m> \033[0m" /* 11 */
+
 #define RESET "\033[0m"
 #define CLEAR "\033[2J"
 #define CURSOR_HOME "\033[H"

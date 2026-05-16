@@ -14,25 +14,13 @@ typedef struct {
 } nucfData;
 
 typedef struct {
-    int length;
-    int lines;
-    float *data;
-} nucfDataLite;
-
-typedef struct {
     int sets;
     nucfData *data_arr;
 } nucfDataset;
 
-typedef struct {
-    int sets;
-    nucfDataLite data_arr;
-} nucfDatasetLite;
-
 static void cleanup()
 {
     printf("Cleaning up.\n");
-
 }
 
 int function1(int a)

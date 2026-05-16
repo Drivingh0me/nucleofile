@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Rewrite printf with a custom fwrite */
+void print_scn(char* str, int len)
+{
+    fwrite(str, 1, len, stdout);
+}
+
 void throw_err(int err)
 {
     printf(REDBOLD "Error: %d" RESET, err);
@@ -40,10 +46,11 @@ void run_tui(Toolset tools)
     char *a;
     int waste;
 
-    printf("nucleofile V0.1\nAngstrom interpreter running.\n");
+    printf("nucleofile V0.1\nAangstrom interpreter running.\n");
     while (tuiShouldRun) {
         TARG_get_term_size(&termRows, &termCols);
-        printf(BLUE "> " RESET);
+        print_scn(INT_NEWLN, 11);
+        // printf(BLUE "> " RESET);
 
         a = fgets(buffer, sizeof(buffer), stdin);
         if (a != buffer) {
