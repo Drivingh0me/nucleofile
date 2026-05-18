@@ -41,5 +41,6 @@ typedef struct {
 #define REDBOLD "\033[1;31m"
 
 void run_tui(Toolset tools);
+void printxt(char* str, int len);
 
 #endif /* TUI_H */

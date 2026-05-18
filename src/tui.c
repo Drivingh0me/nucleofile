@@ -6,7 +6,7 @@
 #include <string.h>
 
 /* Rewrite printf with a custom fwrite */
-void print_scn(char* str, int len)
+void printxt(char* str, int len)
 {
     fwrite(str, 1, len, stdout);
 }
@@ -46,12 +46,12 @@ void run_tui(Toolset tools)
     char *a;
     int waste;
 
-    printf("nucleofile V0.1\nAangstrom interpreter running.\n");
+    printxt("nucleofile V0.1\nAangstrom interpreter running.\n", 47);
     while (tuiShouldRun) {
         TARG_get_term_size(&termRows, &termCols);
-        print_scn(INT_NEWLN, 11);
-        // printf(BLUE "> " RESET);
+        printxt(INT_NEWLN, 11);
 
+        /* Cases to close interpreter */
         a = fgets(buffer, sizeof(buffer), stdin);
         if (a != buffer) {
             tuiShouldRun = 0;
@@ -65,6 +65,7 @@ void run_tui(Toolset tools)
             printf(CLEAR CURSOR_HOME);
         }
 
+        /* Operator and tool calls */
         if (same_word(buffer, "func1\n")) {
             waste = tools.func[COALESCE](1);
             if (waste) {
