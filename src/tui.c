@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Rewrite printf with a custom fwrite */
 void printxt(char* str, int len)
 {
     fwrite(str, 1, len, stdout);
@@ -31,6 +30,14 @@ static int same_word(char* sample, char *key)
     return 1;
 }
 
+int interpreter_parse(char* buffer)
+{
+    /* needs to be easy to add calls and still be fast */
+    while *buffer != '\n' {}
+
+    return 0;
+}
+
 void run_tui(Toolset tools)
 {
     int termRows;
@@ -46,11 +53,13 @@ void run_tui(Toolset tools)
     char *a;
     int waste;
 
-    printxt("nucleofile V0.1\nAangstrom interpreter running.\n", 47);
+    printf("nucleofile V0.1\nAangstrom interpreter running.\n");
     while (tuiShouldRun) {
         TARG_get_term_size(&termRows, &termCols);
+        /* Prints "> " in blue */
         printxt(INT_NEWLN, 11);
 
+        /* MUST MATCH CASES */
         /* Cases to close interpreter */
         a = fgets(buffer, sizeof(buffer), stdin);
         if (a != buffer) {
@@ -65,7 +74,11 @@ void run_tui(Toolset tools)
             printf(CLEAR CURSOR_HOME);
         }
 
+        /* ITERATED CASES */
         /* Operator and tool calls */
+        waste = interpreter_parse(buffer);
+        if (waste) {throw_err(waste)}
+
         if (same_word(buffer, "func1\n")) {
             waste = tools.func[COALESCE](1);
             if (waste) {
