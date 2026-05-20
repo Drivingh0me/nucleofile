@@ -1,5 +1,9 @@
 mod cli;
+// use anyhow::{
+//     Result, anyhow, bail
+// };
 
-fn main() {
-    cli::get_args();
+fn main() -> anyhow::Result<()> {
+    cli::get_args()?;
+    Ok(())
 }

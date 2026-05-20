@@ -1,6 +1,6 @@
 use std::path::PathBuf;
-//use image::ImageReader;
 use clap::Parser;
+use anyhow::{anyhow};
 
 #[derive(Parser, Debug)]
 #[command(arg_required_else_help = false,
@@ -10,7 +10,7 @@ use clap::Parser;
     long_about = "nucleofile can process scientific data")]
 struct Args {
     // Takes any number of args
-    #[arg(short, num_args = 1..)]
+    #[arg(short)]
     resolution: Option<String>,
 
     #[arg(short)]
@@ -21,21 +21,27 @@ struct Args {
     debug: bool,
 }
 
-// pub struct Arguments {
+// pub struct Params{
 //
 // }
 
-pub fn get_args()
+pub fn get_args() -> anyhow::Result<()>
 {
     let args = Args::parse();
-    let resolution: [u32; 2] = [640, 480];
+    // let resolution: [u32; 2] = [640, 480];
 
-    match args.resolution {
-        Some(resolution) => println!("Resolution: {:?}", resolution),
-        None => (),
-    }
+    let resolution = args.resolution.unwrap_or(String::from("640x480"))
+        .split('x')
+        .collect::<Vec<&str>>()
+        .iter()
+        .map(|x| x.parse().unwrap_or(256))
+        .collect::<Vec<u16>>();
+
+    println!("Resolution: {:?}", resolution);
 
     if let Some(file) = args.file {println!("File: {:?}", file)}
 
     if args.debug {println!("Phianon is in debug mode!")}
+
+    Ok(())
 }
