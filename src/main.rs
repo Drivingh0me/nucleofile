@@ -4,6 +4,7 @@ mod cli;
 // };
 
 fn main() -> anyhow::Result<()> {
-    cli::get_args()?;
+    let args: cli::Params = cli::get_args()?;
+    println!("res = {:?}", args.res);
     Ok(())
 }

@@ -21,27 +21,36 @@ struct Args {
     debug: bool,
 }
 
-// pub struct Params{
-//
-// }
+pub struct Params{
+    pub res: [u16; 2],
+    pub file: Option<PathBuf>,
+    pub debug: bool,
+}
 
-pub fn get_args() -> anyhow::Result<()>
+pub fn get_args() -> anyhow::Result<Params>
 {
     let args = Args::parse();
-    // let resolution: [u32; 2] = [640, 480];
 
-    let resolution = args.resolution.unwrap_or(String::from("640x480"))
+    let res = args.resolution.unwrap_or(String::from("640x480"))
         .split('x')
         .collect::<Vec<&str>>()
         .iter()
         .map(|x| x.parse().unwrap_or(256))
         .collect::<Vec<u16>>();
 
-    println!("Resolution: {:?}", resolution);
+    let res: [u16; 2] = match res.len() {
+        0 => [640, 480],
+        1 => [res[0], 256],
+        _ => [res[0], res[1]],
+    };
 
-    if let Some(file) = args.file {println!("File: {:?}", file)}
+    // if let Some(file) = args.file {println!("File: {:?}", file)}
 
     if args.debug {println!("Phianon is in debug mode!")}
 
-    Ok(())
+    Ok(Params {
+        res,
+        file: args.file,
+        debug: args.debug,
+    })
 }
