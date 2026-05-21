@@ -1,0 +1,11 @@
+src/nucleofile.c:32:13:cleanup	16	static
+src/nucleofile.c:38:5:function1	32	static
+src/nucleofile.c:44:5:function2	32	static
+src/nucleofile.c:50:6:nucf_err	32	static
+src/nucleofile.c:65:12:parse_args	16	static
+src/nucleofile.c:83:13:nucf_export	16	static
+src/nucleofile.c:88:12:nucf_run_analysis	48	static
+src/nucleofile.c:105:12:nucf_coalesce_data	32	static
+src/nucleofile.c:112:5:nucf_startup	16	static
+src/nucleofile.c:118:5:nucf_run_app	96	static
+src/nucleofile.c:150:5:nucf_shutdown	32	static

@@ -1,0 +1,3 @@
+src/tui.c:8:6:throw_err	32	static
+src/tui.c:13:12:same_word	16	static
+src/tui.c:28:6:run_tui	320	static

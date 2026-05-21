@@ -1,4 +1,7 @@
 mod cli;
+mod math;
+
+// Make custom errors with enum!
 // use anyhow::{
 //     Result, anyhow, bail
 // };
