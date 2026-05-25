@@ -7,7 +7,9 @@ use anyhow::{anyhow};
     author = "Caleb Griffin",
     version = "0.1.1",
     about = "nucleofile is a tool for chemists to process data",
-    long_about = "nucleofile can process scientific data")]
+    long_about = "nucleofile can process scientific data, \
+        specifally focused on chemistry related data such as \
+        NMR, ESI-MS, kinetc plots, UV-Vis and more.")]
 struct Args {
     // Takes any number of args
     #[arg(short)]
