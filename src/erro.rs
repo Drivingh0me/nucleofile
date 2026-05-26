@@ -1,10 +1,13 @@
 use std::result;
+use std::io;
+use std::fmt::{Debug, Display};
+use std::error;
 
-type Result<T> = result::Result<T, Err>;
+pub type Result<T> = result::Result<T, Err>;
 
-// Not sure how to do this yet, but all err enum
-#[derive]
-enum Err<E: String> {
+// Use ".map_err(erro::Err::E)?" to bubble up error
+#[derive(Debug)]
+enum Err {
     ValueError(E),
     TaskFailed(E),
 }
