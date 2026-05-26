@@ -19,11 +19,17 @@ impl Mtx {
     }
 }
 
-fn outer_product(u: Vec<f64>, v: vec<f64>) -> anyhow::Result<Mtx> {
-    if u.len != v.len {
-        bail!("Vectors are not same length u:{} v:{}", u.len, v.len))
-    }
+// Determines |u><v|
+fn outer_product(u: vec<f64>, v: vec<f64>) -> anyhow::Result<Mtx> {
     for x in e.iter() {
         todo!
     }
+}
+
+// Determines <u|v>
+fn inner_product(u: vec<f64>, v: vec<f64>) -> Mtx {
+    if u.len != v.len{
+        bail!("Vector lengths do not match: u:{} v:{}", u.len, v.len)
+    }
+    todo!
 }
