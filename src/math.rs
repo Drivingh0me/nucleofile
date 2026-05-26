@@ -1,5 +1,7 @@
 use anyhow::bail
 
+// Try allocating large vectors first with Vec::with_capacity
+
 // pub type Result<T> = std::result::Result<T, MathErr>;
 // Use From <T> for ? operator.
 // Needs std::error::Error, Debug, and Display traits.
