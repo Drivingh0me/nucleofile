@@ -1,6 +1,8 @@
 use anyhow::bail
 
 // Try allocating large vectors first with Vec::with_capacity
+// Instead of .push(), use try_reserve() or try_reserve_exact()
+// which return Reslut<T, TryReserveError> so can handle failure.
 
 // pub type Result<T> = std::result::Result<T, MathErr>;
 // Use From <T> for ? operator.
