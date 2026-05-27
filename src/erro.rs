@@ -17,15 +17,16 @@ enum Err<E> {
 impl<E: fmt::Display + fmt::Debug> fmt::Display for Err<E> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Err::IoError(e) => todo!,
-            Err::ParseError(e) => todo!,
+            Err::IoError(e) => write!(f, "IoError: {}", e),
+            Err::ParseError(e) => write!(f, "ParseError error: {}", e),
             Err::Other(e) => write!(f, "Generic error: {}", e),
         }
     }
 }
 
-impl<E: error:Error + 'static> error::Error for Err<E> {
-    fn source(&self) -> Option<&(dyn Err + 'static)> {
+    // fn source(&self) -> Option<&(dyn Err + 'static)> {
+impl<E: error::Error + 'static> error::Error for Err<E> {
+    fn source(&self) -> Option<&Err> {
         match self {
             Err::IoError(e) => Some(e),
             Err::ParseError(e) => Some(e),
@@ -44,4 +45,11 @@ impl<E> From<ParseIntError> for Err {
     fn from(err: ParseIntError) -> Self {
         Err::ParseError(err)
     }
+}
+
+// Teesting
+
+pub fn test_err(x: i32) -> Result<i32> {
+    if x > 0 {}
+    else {Err(io::Error::new(io::ErrorKind::Other, "Caleb error message"))}
 }
