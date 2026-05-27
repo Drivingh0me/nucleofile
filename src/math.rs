@@ -2,7 +2,12 @@ use anyhow::bail
 
 // Try allocating large vectors first with Vec::with_capacity
 // Instead of .push(), use try_reserve() or try_reserve_exact()
-// which return Reslut<T, TryReserveError> so can handle failure.
+// which return Reslut<T, TryReserveError> so can handle failure to alloc.
+// Can then use push() and extend and the rest, as well as shrink_to_fit()
+// to make the vec.
+
+// Can also consider using Box<[T]> for unchanging length, but all elems
+// must be filled. Box is likely better for saving a vec for a long life.
 
 // pub type Result<T> = std::result::Result<T, MathErr>;
 // Use From <T> for ? operator.
