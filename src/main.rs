@@ -8,7 +8,7 @@ fn main() -> anyhow::Result<()> {
     println!("res = {:?}", args.res);
 
     // Testing errors
-    let test: i32 = dbg!(erro::test_err()?);
+    let test: i32 = dbg!(erro::test_err(-2)?);
 
     Ok(())
 }
