@@ -6,6 +6,7 @@ use std::num::ParseIntError;
 
 pub type Result<T> = result::Result<T, Err>;
 
+// Used AI to figure out the dyn + Send + Sync
 #[derive(Debug)]
 pub enum Err {
     IoError(io::Error),
