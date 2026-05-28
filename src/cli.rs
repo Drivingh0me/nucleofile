@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use clap::Parser;
-// use anyhow::{anyhow};
+
+use crate::erro::Result;
 
 #[derive(Parser, Debug)]
 #[command(arg_required_else_help = false,
@@ -29,7 +30,7 @@ pub struct Params{
     pub debug: bool,
 }
 
-pub fn get_args() -> anyhow::Result<Params>
+pub fn get_args() -> Result<Params>
 {
     let args = Args::parse();
 
