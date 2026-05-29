@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use clap::Parser;
 
-use crate::erro::Result;
+use crate::error::Result;
 
 #[derive(Parser, Debug)]
 #[command(arg_required_else_help = false,

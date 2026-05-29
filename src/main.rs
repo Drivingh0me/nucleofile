@@ -1,15 +1,13 @@
 mod cli;
-mod erro;
+mod error;
 // mod math;
 
-fn main() -> erro::Result<()> {
+fn main() -> error::Result<()> {
     let args: cli::Params = cli::get_args()?;
     println!("res = {:?}", args.res);
 
     // Testing errors
-    let _test: i32 = erro::test_err(1)?;
-
-    let _test2: u32 = erro::test_err2(1)?;
+    let _test: u32 = error::test_err(-1)?;
 
     print!("yay!\n");
 
