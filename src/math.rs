@@ -13,6 +13,8 @@ use error::{Error, Result};
 // Use From <T> for ? operator.
 // Needs std::error::Error, Debug, and Display traits.
 
+// Add a way to do linked lists, dictionaries/hashmaps, unions, units.
+
 pub struct Mtx {
     elem: Vec<f64>,
     size: [u64; 2],
