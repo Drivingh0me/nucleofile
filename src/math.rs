@@ -36,9 +36,14 @@ fn outer_product(u: vec<f64>, v: vec<f64>) -> Result<Mtx> {
 }
 
 // Determines <u|v>
-fn inner_product(u: vec<f64>, v: vec<f64>) -> Result<Mtx> {
+fn inner_product(u: vec<f64>, v: vec<f64>) -> Result<f64> {
     if u.len != v.len{
         return Err(Error::x{});
     }
+    todo!
+}
+
+// Kronecker product A{OX}B
+fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
     todo!
 }
