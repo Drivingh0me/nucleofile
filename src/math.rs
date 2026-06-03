@@ -17,20 +17,23 @@ use crate::error::{Error, Result};
 
 pub struct Mtx {
     elem: Vec<f64>,
+    // shape is mxn, [m, n]
     shape: [u64; 2],
 }
 
 impl Mtx {
-    // Remove elem from constructor
-    fn new(shape: [u64; 2]) -> Self {
-        Self {Vec::<f64>::new(), shape}
+    fn new(shape: [u64; 2]) -> Result<Self> {
+        // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])
+        let elem: Vec::<f64>::new();
+        elem.try_reserve()?;
+        Self {elem, shape}
     }
 
     fn from_vec(elem: Vec<f64>, shape: [u64; 2]) -> Self {
         Self {elem, size}
     }
 
-    fn push(e: f64) -> Self {
+    fn push(self, e: f64) -> Self {
         todo!()
     }
 
@@ -41,11 +44,14 @@ impl Mtx {
 
 // Determines |u><v|
 fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
-    // Initialize the returned Mtx a
-    let mut a = Mtx::new([u.len(), v.len()]);
-    for x in u.iter() {
+    let m: u32 = u.len();
+    let n: u32 = v.len();
+    let mxn: u64 = m * n;
+    let mut a = Mtx::new([m, n])?;
+
+    for x in 0..mxn {
         // Maybe use .get(x)
-        a.push(u[x] * v[x]);
+        a.push(u[x / m] * v[x % n]);
     }
 
     Ok(a)

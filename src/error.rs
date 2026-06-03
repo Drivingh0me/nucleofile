@@ -12,6 +12,8 @@ pub enum Error {
     ParseInt(#[from] std::num::ParseIntError),
     #[error("Try From Int Error: {0}")]
     TryIntErr(#[from] std::num::TryFromIntError),
+    #[error("Failed to Allocate Memory Error: {0}")]
+    FailedAlloc(#[from] std::collections::TryReserveError),
 }
 
 // Testing
