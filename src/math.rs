@@ -10,18 +10,24 @@ use crate::error::{Error, Result};
 // must be filled. Box is likely better for saving a vec for a long life.
 
 // pub type Result<T> = std::result::Result<T, MathErr>;
-// Use From <T> for ? operator.
-// Needs std::error::Error, Debug, and Display traits.
 
 // Add a way to do linked lists, dictionaries/hashmaps, unions, units.
 
 // Consider Vec<T> so that any type that has multiplication
-// will work.
+// will work. (Mtx<T> {elem: Vec<T>, dim: [u64; 2],}
+// Can also restrict type with trait bound and impl block.
 // Also consider using uom for units.
+// Consider implementing Mul for Mtx (fn mul) and Vec to make easy.
 pub struct Mtx {
     elem: Vec<f64>,
     // shape is mxn, [m, n]
     shape: [u64; 2],
+}
+
+// Tensor struct
+pub struct Tns<T> {
+    elem: Vec<T>,
+    rank: Vec<u64>,
 }
 
 impl Mtx {
@@ -40,9 +46,13 @@ impl Mtx {
         todo!()
     }
 
-    fn determinant(self) -> Result<f64> {
+    fn echelon(self) -> Result<Self> {
         todo!()
     }
+}
+
+fn determinant(a: Mtx) -> Result<f64> {
+    todo!()
 }
 
 // Determines |u><v|
