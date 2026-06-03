@@ -17,12 +17,16 @@ use crate::error::{Error, Result};
 
 pub struct Mtx {
     elem: Vec<f64>,
-    size: [u64; 2],
+    shape: [u64; 2],
 }
 
 impl Mtx {
     // Remove elem from constructor
-    fn new(elem: Vec<f64>, size: [u64; 2]) -> Self {
+    fn new(shape: [u64; 2]) -> Self {
+        Self {Vec::<f64>::new(), shape}
+    }
+
+    fn from_vec(elem: Vec<f64>, shape: [u64; 2]) -> Self {
         Self {elem, size}
     }
 
@@ -38,10 +42,13 @@ impl Mtx {
 // Determines |u><v|
 fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
     // Initialize the returned Mtx a
-    let a = Mtx::new([u.len(), v.len()]);
+    let mut a = Mtx::new([u.len(), v.len()]);
     for x in u.iter() {
-        a.push(u.x * v.x);
+        // Maybe use .get(x)
+        a.push(u[x] * v[x]);
     }
+
+    Ok(a)
 }
 
 // Determines <u|v>
@@ -55,8 +62,9 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
 
 // Kronecker product A{OX}B
 fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
-    Ok(Mtx{
-        elem: vec![0, 1, 2, 3],
-        size: [2, 2],
-    })
+    let mut c = Mtx::from_vec(
+        vec![0, 1, 2, 3], [2, 2],
+    );
+
+    Ok(c)
 }
