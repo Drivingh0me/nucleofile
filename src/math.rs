@@ -1,7 +1,7 @@
 use crate::error::{Error, Result};
 
 // Try allocating large vectors first with Vec::with_capacity
-// Instead of .push(), use try_reserve() or try_reserve_exact()
+// Use try_reserve() or try_reserve_exact()
 // which return Reslut<T, TryReserveError> so can handle failure to alloc.
 // Can then use push() and extend and the rest, as well as shrink_to_fit()
 // to make the vec.
@@ -15,6 +15,9 @@ use crate::error::{Error, Result};
 
 // Add a way to do linked lists, dictionaries/hashmaps, unions, units.
 
+// Consider Vec<T> so that any type that has multiplication
+// will work.
+// Also consider using uom for units.
 pub struct Mtx {
     elem: Vec<f64>,
     // shape is mxn, [m, n]
