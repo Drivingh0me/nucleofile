@@ -8,6 +8,12 @@ anyhow = "1.0.102"
 clap = {version = "4.5", features = ["derive"]}
 thiserror = "2.0.18"
 
+egui = {version = "0.29", optional = true}
+
+[features]
+default = []
+gui = ["dep:egui"]
+
 [profile.release]
 opt-level = "s"
 lto = true

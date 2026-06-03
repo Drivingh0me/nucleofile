@@ -6,6 +6,11 @@ The focus of nucleofile is to:
 - Analyze chemical data.
 
 ## Compile
+Compile with TUI:
 ```
 cargo build --release
+```
+Compile with GUI:
+```
+cargo build --release --features gui
 ```
