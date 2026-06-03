@@ -18,6 +18,12 @@ use crate::error::{Error, Result};
 // Can also restrict type with trait bound and impl block.
 // Also consider using uom for units.
 // Consider implementing Mul for Mtx (fn mul) and Vec to make easy.
+
+// Maybe this is a bad layout for point. Make more generic?
+pub struct Pnt {
+    p: [f64; 2],
+}
+
 pub struct Mtx {
     elem: Vec<f64>,
     // shape is mxn, [m, n]
@@ -47,6 +53,10 @@ impl Mtx {
     }
 
     fn echelon(self) -> Result<Self> {
+        todo!()
+    }
+
+    fn derivative(self) -> Result<Self> {
         todo!()
     }
 }
@@ -79,11 +89,17 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
     Ok(0.0)
 }
 
-// Kronecker product A{OX}B
+// Explicit kronecker product A{OX}B
 fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
     let mut c = Mtx::from_vec(
         vec![0, 1, 2, 3], [2, 2],
     );
 
     Ok(c)
+}
+
+// Lazy calculates (i, j) elem of kronecker product
+fn knonecker_product(a: Mtx, b: Mtx, p: Pnt) -> Result<f64> {
+
+    Ok(0.0)
 }
