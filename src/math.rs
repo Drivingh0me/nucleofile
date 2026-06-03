@@ -1,4 +1,4 @@
-use error::{Error, Result};
+use crate::error::{Error, Result};
 
 // Try allocating large vectors first with Vec::with_capacity
 // Instead of .push(), use try_reserve() or try_reserve_exact()
@@ -21,8 +21,13 @@ pub struct Mtx {
 }
 
 impl Mtx {
+    // Remove elem from constructor
     fn new(elem: Vec<f64>, size: [u64; 2]) -> Self {
         Self {elem, size}
+    }
+
+    fn push(e: f64) -> Self {
+        todo!()
     }
 
     fn determinant(self) -> Result<f64> {
@@ -31,21 +36,27 @@ impl Mtx {
 }
 
 // Determines |u><v|
-fn outer_product(u: vec<f64>, v: vec<f64>) -> Result<Mtx> {
-    for x in e.iter() {
-        todo!()
+fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
+    // Initialize the returned Mtx a
+    let a = Mtx::new([u.len(), v.len()]);
+    for x in u.iter() {
+        a.push(u.x * v.x);
     }
 }
 
 // Determines <u|v>
-fn inner_product(u: vec<f64>, v: vec<f64>) -> Result<f64> {
-    if u.len != v.len{
+fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
+    if u.len() != v.len() {
         return Err(Error::x{});
     }
-    todo!()
+
+    Ok(0.0)
 }
 
 // Kronecker product A{OX}B
 fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
-    todo!()
+    Ok(Mtx{
+        elem: vec![0, 1, 2, 3],
+        size: [2, 2],
+    })
 }
