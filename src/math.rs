@@ -24,6 +24,11 @@ pub struct Pnt {
     p: [f64; 2],
 }
 
+pub struct Elm {
+    // i j
+    elem: [u32; 2]
+}
+
 pub struct Mtx {
     elem: Vec<f64>,
     // shape is mxn, [m, n]
@@ -52,7 +57,7 @@ impl Mtx {
         todo!()
     }
 
-    fn echelon(self) -> Result<Self> {
+    fn echelon_form(self) -> Result<Self> {
         todo!()
     }
 
@@ -72,6 +77,7 @@ fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
     let mxn: u64 = m * n;
     let mut a = Mtx::new([m, n])?;
 
+    // Make this a nested for loop to be faster
     for x in 0..mxn {
         // Maybe use .get(x)
         a.push(u[x / m] * v[x % n]);
@@ -99,7 +105,7 @@ fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
 }
 
 // Lazy calculates (i, j) elem of kronecker product
-fn knonecker_product(a: Mtx, b: Mtx, p: Pnt) -> Result<f64> {
+fn knonecker_product_elem(a: Mtx, b: Mtx, p: Pnt) -> Result<f64> {
 
     Ok(0.0)
 }

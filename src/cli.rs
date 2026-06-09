@@ -49,7 +49,7 @@ pub fn get_args() -> Result<Params>
 
     // if let Some(file) = args.file {println!("File: {:?}", file)}
 
-    if args.debug {println!("Phianon is in debug mode!")}
+    if args.debug {println!("nucleofile is in debug mode!")}
 
     Ok(Params {
         res,
