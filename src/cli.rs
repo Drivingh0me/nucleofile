@@ -24,8 +24,9 @@ struct Args {
     debug: bool,
 }
 
+// Make Resolution the struct from render.rs
 pub struct Params{
-    pub res: [u16; 2],
+    pub res: render::Resolution,
     pub file: Option<PathBuf>,
     pub debug: bool,
 }

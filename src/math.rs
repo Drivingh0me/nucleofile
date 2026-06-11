@@ -41,6 +41,10 @@ pub struct Tns<T> {
     rank: Vec<u64>,
 }
 
+struct Func {
+    // Takes an x and outputs a y for generic but definable function?
+}
+
 impl Mtx {
     fn new(shape: [u64; 2]) -> Result<Self> {
         // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])

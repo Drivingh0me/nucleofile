@@ -7,7 +7,7 @@ pub struct Resolution {
     h: u32,
 }
 
-fn func_to_image(f: math::Func, res: Resolution) -> Result<RgbaImage> {
+fn plot_func(f: math::Func, res: Resolution) -> Result<RgbaImage> {
     let mut img = image::RgbaImage::new(res.w, res.h)
 }
 
