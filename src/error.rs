@@ -14,6 +14,8 @@ pub enum Error {
     TryIntErr(#[from] std::num::TryFromIntError),
     #[error("Failed to Allocate Memory Error: {0}")]
     FailedAlloc(#[from] std::collections::TryReserveError),
+    #[error("Incorrect vector size")]
+    VectorSize,
 }
 
 // Testing

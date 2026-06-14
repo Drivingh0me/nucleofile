@@ -26,19 +26,19 @@ pub struct Pnt {
 
 pub struct Elm {
     // i j
-    elem: [u32; 2]
+    elem: [usize; 2]
 }
 
 pub struct Mtx {
     elem: Vec<f64>,
     // shape is mxn, [m, n]
-    shape: [u64; 2],
+    shape: [usize; 2],
 }
 
 // Tensor struct
 pub struct Tns<T> {
     elem: Vec<T>,
-    rank: Vec<u64>,
+    rank: Vec<usize>,
 }
 
 struct Func {
@@ -46,15 +46,15 @@ struct Func {
 }
 
 impl Mtx {
-    fn new(shape: [u64; 2]) -> Result<Self> {
+    fn new(shape: [usize; 2]) -> Result<Self> {
         // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])
-        let elem: Vec::<f64>::new();
-        elem.try_reserve()?;
-        Self {elem, shape}
+        let mut elem = Vec::<f64>::new();
+        elem.try_reserve(shape[0] * shape[1])?;
+        Ok(Self {elem, shape})
     }
 
-    fn from_vec(elem: Vec<f64>, shape: [u64; 2]) -> Self {
-        Self {elem, size}
+    fn from_vec(vector: Vec<f64>, shape: [usize; 2]) -> Result<Self> {
+        Ok(Self {elem: vector, shape})
     }
 
     fn push(self, e: f64) -> Self {
@@ -76,9 +76,9 @@ fn determinant(a: Mtx) -> Result<f64> {
 
 // Determines |u><v|
 fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
-    let m: u32 = u.len();
-    let n: u32 = v.len();
-    let mxn: u64 = m * n;
+    let m: usize = u.len();
+    let n: usize = v.len();
+    let mxn: usize = m * n;
     let mut a = Mtx::new([m, n])?;
 
     // Make this a nested for loop to be faster
@@ -93,7 +93,7 @@ fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
 // Determines <u|v>
 fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
     if u.len() != v.len() {
-        return Err(Error::x{});
+        return Err(Error::VectorSize);
     }
 
     Ok(0.0)

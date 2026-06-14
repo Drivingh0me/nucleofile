@@ -48,9 +48,18 @@ pub fn get_args() -> Result<Params>
         .collect::<Vec<u16>>();
 
     let res: render::Resolution = match res.len() {
-        0 => a,
-        1 => b,
-        _ => c,
+        0 => render::Resolution {
+            w: 256,
+            h: 256,
+        },
+        1 => render::Resolution {
+            w: res[0],
+            h: 256,
+        },
+        _ => render::Resolution {
+            w: res[0],
+            h: res[1],
+        },
     };
 
     // let res: [u16; 2] = match res.len() {
