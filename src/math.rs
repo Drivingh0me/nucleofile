@@ -57,15 +57,16 @@ impl Mtx {
         Ok(Self {elem: vector, shape})
     }
 
-    fn push(self, e: f64) -> Self {
+    // Push does not affect shape
+    fn push(&mut self, e: f64) {
+        self.elem.push(e);
+    }
+
+    fn echelon_form(&mut self) -> Result<Self> {
         todo!()
     }
 
-    fn echelon_form(self) -> Result<Self> {
-        todo!()
-    }
-
-    fn derivative(self) -> Result<Self> {
+    fn derivative(&mut self) -> Result<Self> {
         todo!()
     }
 }
@@ -81,7 +82,8 @@ fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
     let mxn: usize = m * n;
     let mut a = Mtx::new([m, n])?;
 
-    // Make this a nested for loop to be faster
+    // Make this a nested for loop to be faster. This can be used for lazy
+    // deterination of one elem of outer product.
     for x in 0..mxn {
         // Maybe use .get(x)
         a.push(u[x / m] * v[x % n]);
@@ -101,9 +103,19 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
 
 // Explicit kronecker product A{OX}B
 fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
-    let mut c = Mtx::from_vec(
-        vec![0, 1, 2, 3], [2, 2],
-    );
+    let c_shape: [usize; 2] =
+        [a.shape[0] * b.shape[0],
+        a.shape[1] * b.shape[1]];
+    let m: usize = c_shape[0];
+    let n: usize = c_shape[1];
+
+    let mut c = Mtx::new(c_shape)?;
+
+    for i in 0..m {
+        for j in 0..n {
+            c.push(a.elem[i] * b.elem[j]);
+        }
+    }
 
     Ok(c)
 }

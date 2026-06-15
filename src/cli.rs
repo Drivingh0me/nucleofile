@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use clap::Parser;
+use crate::render;
 
 use crate::error::Result;
 

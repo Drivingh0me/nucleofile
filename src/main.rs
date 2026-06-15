@@ -1,6 +1,7 @@
 mod cli;
 mod error;
 mod math;
+mod render;
 
 use error::Result;
 
