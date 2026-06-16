@@ -46,7 +46,7 @@ pub fn get_args() -> Result<Params>
         .collect::<Vec<&str>>()
         .iter()
         .map(|x| x.parse().unwrap_or(256))
-        .collect::<Vec<u16>>();
+        .collect::<Vec<u32>>();
 
     let res: render::Resolution = match res.len() {
         0 => render::Resolution {

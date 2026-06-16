@@ -41,7 +41,7 @@ pub struct Tns<T> {
     rank: Vec<usize>,
 }
 
-struct Func {
+pub struct Func {
     // Takes an x and outputs a y for generic but definable function?
 }
 
