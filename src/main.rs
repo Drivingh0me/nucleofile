@@ -1,9 +1,9 @@
 mod cli;
-mod error;
+pub mod error;
 mod math;
 mod render;
 
-#[cfg(feature = "gui")]
+// #[cfg(feature = "gui")]
 mod gui;
 
 use error::Result;
