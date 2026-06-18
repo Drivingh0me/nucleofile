@@ -3,6 +3,9 @@ mod error;
 mod math;
 mod render;
 
+#[cfg(feature = "gui")]
+mod gui;
+
 use error::Result;
 
 fn main() -> Result<()> {
@@ -10,7 +13,7 @@ fn main() -> Result<()> {
     println!("res = {:?}", args.res);
 
     #[cfg(feature = "gui")]
-    println!("GUI not implemented yet");
+    gui::run_gui()?;
 
     #[cfg(not(feature = "gui"))]
     println!("TUI compiled");

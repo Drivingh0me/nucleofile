@@ -16,6 +16,8 @@ pub enum Error {
     FailedAlloc(#[from] std::collections::TryReserveError),
     #[error("Incorrect vector size")]
     VectorSize,
+    #[error("Eframe error: {0}")]
+    Eframe(#[from] eframe::Error),
 }
 
 // Testing

@@ -12,5 +12,5 @@ cargo build --release
 ```
 Compile with GUI:
 ```
-cargo build --release --features gui
+cargo build --release --features "gui"
 ```

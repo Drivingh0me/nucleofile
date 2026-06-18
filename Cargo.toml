@@ -9,12 +9,11 @@ clap = {version = "4.5", features = ["derive"]}
 thiserror = "2.0.18"
 image = "0.25"
 
-egui = {version = "0.31", optional = true}
-eframe = {version = "0.31", optional = true}
+eframe = {version = "0.34", optional = true}
 
 [features]
 default = []
-gui = ["dep:egui"]
+gui = ["dep:eframe"]
 
 [profile.release]
 opt-level = "s"
