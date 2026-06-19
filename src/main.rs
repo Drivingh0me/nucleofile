@@ -3,7 +3,7 @@ pub mod error;
 mod math;
 mod render;
 
-// #[cfg(feature = "gui")]
+#[cfg(feature = "gui")]
 mod gui;
 
 use error::Result;
@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     gui::run_gui()?;
 
     #[cfg(not(feature = "gui"))]
-    println!("TUI compiled");
+    println!("TUI not implemented");
 
     Ok(())
 }
