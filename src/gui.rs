@@ -2,7 +2,6 @@ use eframe::egui;
 
 use crate::error::Result;
 
-
 pub fn run_gui() -> Result<()> {
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
@@ -14,7 +13,9 @@ pub fn run_gui() -> Result<()> {
 }
 
 #[derive(Default)]
-struct MyEguiApp {}
+struct MyEguiApp {
+    counter: isize,
+}
 
 impl MyEguiApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
