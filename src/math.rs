@@ -9,8 +9,6 @@ use crate::error::{Error, Result};
 // Can also consider using Box<[T]> for unchanging length, but all elems
 // must be filled. Box is likely better for saving a vec for a long life.
 
-// pub type Result<T> = std::result::Result<T, MathErr>;
-
 // Add a way to do linked lists, dictionaries/hashmaps, unions, units.
 
 // Consider Vec<T> so that any type that has multiplication
@@ -20,13 +18,13 @@ use crate::error::{Error, Result};
 // Consider implementing Mul for Mtx (fn mul) and Vec to make easy.
 
 // Maybe this is a bad layout for point. Make more generic?
-pub struct Pnt {
+pub struct Point {
     p: [f64; 2],
 }
 
-pub struct Elm {
-    // i j
-    elem: [usize; 2]
+pub struct Element {
+    i: usize,
+    j: usize,
 }
 
 pub struct Mtx {
@@ -69,27 +67,34 @@ impl Mtx {
     fn derivative(&mut self) -> Result<Self> {
         todo!()
     }
-}
 
-fn determinant(a: Mtx) -> Result<f64> {
-    todo!()
+    fn determinant(&self) -> Result<f64> {
+        todo!()
+    }
 }
 
 // Determines |u><v|
 fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
     let m: usize = u.len();
     let n: usize = v.len();
-    let mxn: usize = m * n;
     let mut a = Mtx::new([m, n])?;
 
-    // Make this a nested for loop to be faster. This can be used for lazy
-    // deterination of one elem of outer product.
-    for x in 0..mxn {
-        // Maybe use .get(x)
-        a.push(u[x / m] * v[x % n]);
+    for x in 0..m {
+        for y in 0..n {
+            a.push(u[x] * v[y]);
+        }
     }
 
     Ok(a)
+}
+
+// Finds single element of |u><v|
+fn outer_product_elem(u: Vec<f64>, v: Vec<f64>, e: Element) -> Result<f64> {
+    if e.i > u.len() || e.j > v.len() {
+        return Err(Error::MtxBounds);
+    }
+
+    Ok(u[e.i] * v[e.j])
 }
 
 // Determines <u|v>
@@ -98,6 +103,7 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
         return Err(Error::VectorSize);
     }
     let mut a: f64 = 0.0;
+
     for x in 0..u.len() {
         a += u[x] * v[x];
     }
@@ -125,7 +131,7 @@ fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
 }
 
 // Lazy calculates (i, j) elem of kronecker product
-fn knonecker_product_elem(a: Mtx, b: Mtx, p: Pnt) -> Result<f64> {
+fn knonecker_product_elem(a: Mtx, b: Mtx, e: Element) -> Result<f64> {
 
     Ok(0.0)
 }
