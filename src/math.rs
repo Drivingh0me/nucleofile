@@ -42,7 +42,7 @@ pub struct Tns<T> {
 }
 
 pub struct Func {
-    // Takes an x and outputs a y for generic but definable function?
+    func_body: String,
 }
 
 impl Mtx {
@@ -97,8 +97,12 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
     if u.len() != v.len() {
         return Err(Error::VectorSize);
     }
+    let mut a: f64 = 0.0;
+    for x in 0..u.len() {
+        a += u[x] * v[x];
+    }
 
-    Ok(0.0)
+    Ok(a)
 }
 
 // Explicit kronecker product A{OX}B
@@ -124,4 +128,16 @@ fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
 fn knonecker_product_elem(a: Mtx, b: Mtx, p: Pnt) -> Result<f64> {
 
     Ok(0.0)
+}
+
+// TESTING
+#[test]
+fn test_inner_product() {
+    let a: Vec<f64> = vec![0.0, 3.0, 1.45, 4.0];
+    let b: Vec<f64> = vec![0.2, 7.0, 4.0, 5.0];
+    let c: f64 = 46.8;
+    let tolerance: f64 = c * 0.0001;
+
+    let error = inner_product(a, b).unwrap() - c;
+    assert!((error).abs() <= tolerance);
 }
