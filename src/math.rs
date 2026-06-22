@@ -19,7 +19,8 @@ use crate::error::{Error, Result};
 
 // Maybe this is a bad layout for point. Make more generic?
 pub struct Point {
-    p: [f64; 2],
+    p: Vec<f64>,
+    dimension: usize,
 }
 
 pub struct Element {
@@ -29,8 +30,9 @@ pub struct Element {
 
 pub struct Mtx {
     elem: Vec<f64>,
-    // shape is mxn, [m, n]
-    shape: [usize; 2],
+    // shape
+    m: usize,
+    n: usize,
 }
 
 // Tensor struct
@@ -44,20 +46,24 @@ pub struct Func {
 }
 
 impl Mtx {
-    fn new(shape: [usize; 2]) -> Result<Self> {
+    fn new(m: usize, n: usize) -> Result<Self> {
         // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])
         let mut elem = Vec::<f64>::new();
-        elem.try_reserve(shape[0] * shape[1])?;
-        Ok(Self {elem, shape})
+        elem.try_reserve(m * n)?;
+        Ok(Self {elem, m, n})
     }
 
-    fn from_vec(vector: Vec<f64>, shape: [usize; 2]) -> Result<Self> {
-        Ok(Self {elem: vector, shape})
+    fn from_vec(vector: Vec<f64>, m: usize, n: usize) -> Result<Self> {
+        Ok(Self {elem: vector, m, n})
     }
 
     // Push does not affect shape
     fn push(&mut self, e: f64) {
         self.elem.push(e);
+    }
+
+    fn concatonate(&mut self, a: Mtx, axis: usize) -> Result<Self> {
+        todo!()
     }
 
     fn echelon_form(&mut self) -> Result<Self> {
@@ -77,7 +83,7 @@ impl Mtx {
 fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
     let m: usize = u.len();
     let n: usize = v.len();
-    let mut a = Mtx::new([m, n])?;
+    let mut a = Mtx::new(m, n)?;
 
     for x in 0..m {
         for y in 0..n {
@@ -113,13 +119,13 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
 
 // Explicit kronecker product A{OX}B
 fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
-    let c_shape: [usize; 2] =
-        [a.shape[0] * b.shape[0],
-        a.shape[1] * b.shape[1]];
-    let m: usize = c_shape[0];
-    let n: usize = c_shape[1];
+    // let c_shape: [usize; 2] =
+    //     [a.shape[0] * b.shape[0],
+    //     a.shape[1] * b.shape[1]];
+    let m: usize = a.m * b.m;
+    let n: usize = a.n * b.n;
 
-    let mut c = Mtx::new(c_shape)?;
+    let mut c = Mtx::new(m, n)?;
 
     for i in 0..m {
         for j in 0..n {
