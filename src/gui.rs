@@ -13,9 +13,7 @@ pub fn run_gui() -> Result<()> {
 }
 
 #[derive(Default)]
-struct MyEguiApp {
-    counter: isize,
-}
+struct MyEguiApp {}
 
 impl MyEguiApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
