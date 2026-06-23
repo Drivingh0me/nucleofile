@@ -1,4 +1,5 @@
 mod cli;
+mod interpreter;
 pub mod error;
 mod math;
 mod render;
@@ -16,7 +17,7 @@ fn main() -> Result<()> {
     gui::run_gui()?;
 
     #[cfg(not(feature = "gui"))]
-    println!("TUI not implemented");
+    interpreter::run_interpreter()?;
 
     Ok(())
 }
