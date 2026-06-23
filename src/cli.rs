@@ -36,11 +36,6 @@ pub fn get_args() -> Result<Params>
 {
     let args = Args::parse();
 
-    // let res: render::Resolution = args.resolution
-    //     .unwrap_or(String::from("640x480"))
-    //     .split('x') // Convert iter to Resolution
-
-
     let res = args.resolution.unwrap_or(String::from("640x480"))
         .split('x')
         .collect::<Vec<&str>>()
@@ -62,16 +57,6 @@ pub fn get_args() -> Result<Params>
             h: res[1],
         },
     };
-
-    // let res: [u16; 2] = match res.len() {
-    //     0 => [640, 480],
-    //     1 => [res[0], 256],
-    //     _ => [res[0], res[1]],
-    // };
-
-    // if let Some(file) = args.file {println!("File: {:?}", file)}
-
-    // if args.debug {println!("nucleofile is in debug mode!")}
 
     Ok(Params {
         res,

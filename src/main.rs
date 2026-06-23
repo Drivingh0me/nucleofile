@@ -11,7 +11,7 @@ use error::Result;
 
 fn main() -> Result<()> {
     let args: cli::Params = cli::get_args()?;
-    println!("res = {:?}", args.res);
+    // println!("res = {:?}", args.res);
 
     #[cfg(feature = "gui")]
     gui::run_gui()?;
