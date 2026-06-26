@@ -142,14 +142,18 @@ fn knonecker_product_elem(a: Mtx, b: Mtx, e: Element) -> Result<f64> {
     Ok(0.0)
 }
 
-// TESTING
-#[test]
-fn test_inner_product() {
-    let a: Vec<f64> = vec![0.0, 3.0, 1.45, 4.0];
-    let b: Vec<f64> = vec![0.2, 7.0, 4.0, 5.0];
-    let c: f64 = 46.8;
-    let tolerance: f64 = c * 0.0001;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let error = inner_product(a, b).unwrap() - c;
-    assert!((error).abs() <= tolerance);
+    #[test]
+    fn test_inner_product() {
+        let a: Vec<f64> = vec![0.0, 3.0, 1.45, 4.0];
+        let b: Vec<f64> = vec![0.2, 7.0, 4.0, 5.0];
+        let c: f64 = 46.8;
+        let tolerance: f64 = c * 0.0001;
+
+        let error = inner_product(a, b).unwrap() - c;
+        assert!((error).abs() <= tolerance);
+    }
 }

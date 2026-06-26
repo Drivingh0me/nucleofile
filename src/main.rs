@@ -1,7 +1,7 @@
 mod cli;
 mod interpreter;
 pub mod error;
-mod math;
+mod compute;
 mod render;
 
 #[cfg(feature = "gui")]
