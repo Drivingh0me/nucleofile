@@ -17,9 +17,70 @@ use crate::error::{Error, Result};
 // Also consider using uom for units.
 // Consider implementing Mul for Mtx (fn mul) and Vec to make easy.
 
-// Maybe this is a bad layout for point. Make more generic?
-pub struct Point {
-    p: Vec<f64>,
+use std::ops::{Add, Sub, Mul, Div}
+
+trait NumberType {}
+
+impl NumberType for i32 {}
+impl NumberType for i64 {}
+impl NumberType for f32 {}
+impl NumberType for f64 {}
+impl NumberType for ComplexNum {}
+
+pub struct ComplexNum {
+    real: f64,
+    i: f64,
+}
+
+// Do Not need these to work with all NumberTypes, just cast into complex
+// before operation
+impl Add for ComplexNum {
+    type Output = ComplexNum;
+
+    fn add(self, other: ComplexNum) -> ComplexNum {
+        ComplexNum {
+            real: self.real - other.real,
+            i: self.i - other.i,
+        }
+    }
+}
+
+impl Sub for ComplexNum {
+    type Output = ComplexNum;
+
+    fn add(self, other: ComplexNum) -> ComplexNum {
+        ComplexNum {
+            real: self.real + other.real,
+            i: self.i + other.i,
+        }
+    }
+}
+
+impl Mul for ComplexNum {
+    type Output = ComplexNum;
+
+    fn add(self, other: ComplexNum) -> ComplexNum {
+        ComplexNum {
+            real: self.real + other.real,
+            i: self.i + other.i,
+        }
+    }
+}
+
+impl Div for ComplexNum {
+    type Output = ComplexNum;
+
+    fn add(self, other: ComplexNum) -> ComplexNum {
+        ComplexNum {
+            real: self.real + other.real,
+            i: self.i + other.i,
+        }
+    }
+}
+// -------------------------------------------
+
+pub struct Point<T: NumberType> {
+    p: Vec<T>,
     dimension: usize,
 }
 
@@ -28,15 +89,15 @@ pub struct Element {
     j: usize,
 }
 
-pub struct Mtx {
-    elem: Vec<f64>,
+pub struct Mtx<T: NumberType> {
+    elem: Vec<T>,
     // shape
     m: usize,
     n: usize,
 }
 
 // Tensor struct
-pub struct Tns<T> {
+pub struct Tns<T: NumberType> {
     elem: Vec<T>,
     rank: Vec<usize>,
 }

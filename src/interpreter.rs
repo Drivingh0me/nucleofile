@@ -74,9 +74,7 @@ fn print_response(
     stdout_lock.write_all(response_arrow)?;
 
     let response: String = response.join(" ");
-    let response_bytes: &[u8] = response.as_bytes();
-
-    stdout_lock.write_all(&response_bytes)?;
+    stdout_lock.write_all(response.as_bytes())?;
     stdout_lock.flush()?;
     Ok(())
 }
