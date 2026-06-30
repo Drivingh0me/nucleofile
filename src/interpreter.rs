@@ -18,28 +18,23 @@ pub fn run_interpreter() -> Result<()> {
 
         if input == "clear\n" {
             clear_screen(&mut stdout)?;
+            continue;
         }
 
         if input == "help\n" {
             print_help(&mut stdout)?;
+            continue;
         }
 
         words = input.split(' ').collect();
 
-        // if let Some(word) = words.get(0) {
-        //     if *word == "echo" {
-        //         for x in 1..words.len() {
-        //             println!("{}", words[x]);
-        //         }
-        //     }
-        // }
         if let Some(word) = words.get(0) {
             if *word == "echo" {
                 let response: Vec<&str> = words
                     .into_iter()
                     .skip(1)
                     .collect();
-                print_response(&mut stdout, &response);
+                print_response(&mut stdout, &response)?;
             }
         }
     }
@@ -78,18 +73,8 @@ fn print_response(
     let response_arrow = b"\x1b[32m> \x1b[0m";
     stdout_lock.write_all(response_arrow)?;
 
-    // Sinitize response as a single byte vec with spaces
-    let response: Vec<&str> = response
-        .iter()
-        // .skip(1)
-        .flat_map(|s| [" ", *s])
-        .collect();
-    // let response = response.remove(0);
-
-    let response_bytes:Vec<u8> = response
-        .iter()
-        .flat_map(|s| s.as_bytes().iter().copied())
-        .collect();
+    let response: String = response.join(" ");
+    let response_bytes: &[u8] = response.as_bytes();
 
     stdout_lock.write_all(&response_bytes)?;
     stdout_lock.flush()?;
