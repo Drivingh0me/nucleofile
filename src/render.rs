@@ -12,7 +12,8 @@ pub struct Resolution {
     pub h: u32,
 }
 
-fn plot_func(f: compute::Func, res: Resolution) -> Result<RgbaImage> {
+// Make this accept a closure from func_coninuous as arg
+fn plot_func(res: Resolution) -> Result<RgbaImage> {
     let mut img = image::RgbaImage::new(res.w, res.h);
     Ok(img)
 }
