@@ -41,8 +41,20 @@ pub struct Tns<T> {
     rank: Vec<usize>,
 }
 
-pub struct Func {
-    func_body: String,
+pub struct FuncBody {
+    func: String,
+}
+
+// Numerical function of x-y data
+pub struct FuncNum {
+    x: Vec<f64>,
+    y: Vec<f64>,
+    len: i32,
+}
+
+// Make this form a real function closure from the string
+pub fn Func_continuous(func: FuncBody) -> impl Fn(f64) -> f64 {
+    move |x| x * x
 }
 
 impl Mtx {

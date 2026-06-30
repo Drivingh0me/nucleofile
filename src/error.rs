@@ -24,6 +24,3 @@ pub enum Error {
 }
 
 // Testing
-pub fn _test_err(x: i32) -> Result<u32> {
-    Ok(TryInto::<u32>::try_into(x)?)
-}
