@@ -17,30 +17,20 @@ use crate::error::{Error, Result};
 // Also consider using uom for units.
 // Consider implementing Mul for Mtx (fn mul) and Vec to make easy.
 
-use std::ops::{Add, Sub, Mul, Div}
-
-trait NumberType {}
-
-impl NumberType for i32 {}
-impl NumberType for i64 {}
-impl NumberType for f32 {}
-impl NumberType for f64 {}
-impl NumberType for ComplexNum {}
+use std::ops::{Add, Sub, Mul, Div, AddAssign};
 
 pub struct ComplexNum {
     real: f64,
     i: f64,
 }
 
-// Do Not need these to work with all NumberTypes, just cast into complex
-// before operation
 impl Add for ComplexNum {
     type Output = ComplexNum;
 
     fn add(self, other: ComplexNum) -> ComplexNum {
         ComplexNum {
-            real: self.real - other.real,
-            i: self.i - other.i,
+            real: self.real + other.real,
+            i: self.i + other.i,
         }
     }
 }
@@ -48,10 +38,10 @@ impl Add for ComplexNum {
 impl Sub for ComplexNum {
     type Output = ComplexNum;
 
-    fn add(self, other: ComplexNum) -> ComplexNum {
+    fn sub(self, other: ComplexNum) -> ComplexNum {
         ComplexNum {
-            real: self.real + other.real,
-            i: self.i + other.i,
+            real: self.real - other.real,
+            i: self.i - other.i,
         }
     }
 }
@@ -59,10 +49,10 @@ impl Sub for ComplexNum {
 impl Mul for ComplexNum {
     type Output = ComplexNum;
 
-    fn add(self, other: ComplexNum) -> ComplexNum {
+    fn mul(self, other: ComplexNum) -> ComplexNum {
         ComplexNum {
-            real: self.real + other.real,
-            i: self.i + other.i,
+            real: (self.real * other.real) - (self.i * other.i),
+            i: (self.real * other.i) + (self.i * other.real),
         }
     }
 }
@@ -70,16 +60,39 @@ impl Mul for ComplexNum {
 impl Div for ComplexNum {
     type Output = ComplexNum;
 
-    fn add(self, other: ComplexNum) -> ComplexNum {
+    fn div(self, other: ComplexNum) -> ComplexNum {
         ComplexNum {
-            real: self.real + other.real,
-            i: self.i + other.i,
+            real: ((self.real * other.real) + (self.i * other.i)) / 
+            ((other.real * other.real) + (other.i * other.i)),
+            i: ((self.i * other.real) - (self.real * other.i)) /
+            ((other.real * other.real) + (other.i * other.i)),
         }
     }
 }
-// -------------------------------------------
 
-pub struct Point<T: NumberType> {
+pub trait Number:
+    Add<Output = Self>
+    + Sub<Output = Self>
+    + Mul<Output = Self>
+    + Div<Output = Self>
+    + Sized
+    + Copy
+{}
+
+impl<T> Number for T where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + Sized
+        + Copy
+{
+    fn from(item: T) -> Self {
+        x
+    }
+}
+
+pub struct Point<T: Number> {
     p: Vec<T>,
     dimension: usize,
 }
@@ -89,7 +102,7 @@ pub struct Element {
     j: usize,
 }
 
-pub struct Mtx<T: NumberType> {
+pub struct Mtx<T: Number> {
     elem: Vec<T>,
     // shape
     m: usize,
@@ -97,7 +110,7 @@ pub struct Mtx<T: NumberType> {
 }
 
 // Tensor struct
-pub struct Tns<T: NumberType> {
+pub struct Tns<T: Number> {
     elem: Vec<T>,
     rank: Vec<usize>,
 }
@@ -118,24 +131,24 @@ pub fn Func_continuous(func: FuncBody) -> impl Fn(f64) -> f64 {
     move |x| x * x
 }
 
-impl Mtx {
+impl<T: Number> Mtx<T> {
     fn new(m: usize, n: usize) -> Result<Self> {
         // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])
-        let mut elem = Vec::<f64>::new();
+        let mut elem = Vec::<T>::new();
         elem.try_reserve(m * n)?;
         Ok(Self {elem, m, n})
     }
 
-    fn from_vec(vector: Vec<f64>, m: usize, n: usize) -> Result<Self> {
+    fn from_vec(vector: Vec<T>, m: usize, n: usize) -> Result<Self> {
         Ok(Self {elem: vector, m, n})
     }
 
     // Push does not affect shape
-    fn push(&mut self, e: f64) {
+    fn push(&mut self, e: T) {
         self.elem.push(e);
     }
 
-    fn concatonate(&mut self, a: Mtx, axis: usize) -> Result<Self> {
+    fn concatonate(&mut self, a: Mtx<T>, axis: usize) -> Result<Self> {
         todo!()
     }
 
@@ -147,13 +160,15 @@ impl Mtx {
         todo!()
     }
 
-    fn determinant(&self) -> Result<f64> {
+    fn determinant(&self) -> Result<T> {
         todo!()
     }
 }
 
 // Determines |u><v|
-fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
+fn outer_product<T: Number>(
+    u: Vec<T>,
+    v: Vec<T>) -> Result<Mtx<T>> {
     let m: usize = u.len();
     let n: usize = v.len();
     let mut a = Mtx::new(m, n)?;
@@ -168,7 +183,10 @@ fn outer_product(u: Vec<f64>, v: Vec<f64>) -> Result<Mtx> {
 }
 
 // Finds single element of |u><v|
-fn outer_product_elem(u: Vec<f64>, v: Vec<f64>, e: Element) -> Result<f64> {
+fn outer_product_elem<T: Number>(
+    u: Vec<T>,
+    v: Vec<T>,
+    e: Element) -> Result<T> {
     if e.i > u.len() || e.j > v.len() {
         return Err(Error::MtxBounds);
     }
@@ -177,11 +195,11 @@ fn outer_product_elem(u: Vec<f64>, v: Vec<f64>, e: Element) -> Result<f64> {
 }
 
 // Determines <u|v>
-fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
+fn inner_product<T: Number>(u: Vec<T>, v: Vec<T>) -> Result<T> {
     if u.len() != v.len() {
         return Err(Error::VectorSize);
     }
-    let mut a: f64 = 0.0;
+    let mut a: T = T::from(0);
 
     for x in 0..u.len() {
         a += u[x] * v[x];
@@ -191,10 +209,7 @@ fn inner_product(u: Vec<f64>, v: Vec<f64>) -> Result<f64> {
 }
 
 // Explicit kronecker product A{OX}B
-fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
-    // let c_shape: [usize; 2] =
-    //     [a.shape[0] * b.shape[0],
-    //     a.shape[1] * b.shape[1]];
+fn knonecker_product<T: Number>(a: Mtx<T>, b: Mtx<T>) -> Result<Mtx<T>> {
     let m: usize = a.m * b.m;
     let n: usize = a.n * b.n;
 
@@ -210,9 +225,12 @@ fn knonecker_product(a: Mtx, b: Mtx) -> Result<Mtx> {
 }
 
 // Lazy calculates (i, j) elem of kronecker product
-fn knonecker_product_elem(a: Mtx, b: Mtx, e: Element) -> Result<f64> {
+fn knonecker_product_elem<T: Number>(
+    a: Mtx<T>,
+    b: Mtx<T>,
+    e: Element) -> Result<T> {
 
-    Ok(0.0)
+    Ok(T::from(0))
 }
 
 #[cfg(test)]
