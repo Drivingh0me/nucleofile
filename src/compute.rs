@@ -77,7 +77,7 @@ pub trait Number:
     + Div<Output = Self>
     + Sized
     + Copy
-    + From<usize>
+    + From<i32>
     + From<f32>
     + AddAssign
 {}
@@ -89,7 +89,7 @@ impl<T> Number for T where
         + Div<Output = T>
         + Sized
         + Copy
-        + From<usize>
+        + From<i32>
         + From<f32>
         + AddAssign
 {}
@@ -129,7 +129,7 @@ pub struct FuncNum<T: Number> {
 }
 
 // Make this form a real function closure from the string
-pub fn Func_continuous(func: FuncBody) -> impl Fn(f64) -> f64 {
+pub fn func_continuous(func: FuncBody) -> impl Fn(f64) -> f64 {
     move |x| x * x
 }
 
