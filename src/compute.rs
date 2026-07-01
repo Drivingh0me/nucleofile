@@ -77,6 +77,9 @@ pub trait Number:
     + Div<Output = Self>
     + Sized
     + Copy
+    + From<usize>
+    + From<f32>
+    + AddAssign
 {}
 
 impl<T> Number for T where
@@ -86,11 +89,10 @@ impl<T> Number for T where
         + Div<Output = T>
         + Sized
         + Copy
-{
-    fn from(item: T) -> Self {
-        x
-    }
-}
+        + From<usize>
+        + From<f32>
+        + AddAssign
+{}
 
 pub struct Point<T: Number> {
     p: Vec<T>,
@@ -120,9 +122,9 @@ pub struct FuncBody {
 }
 
 // Numerical function of x-y data
-pub struct FuncNum {
-    x: Vec<f64>,
-    y: Vec<f64>,
+pub struct FuncNum<T: Number> {
+    x: Vec<T>,
+    y: Vec<T>,
     len: i32,
 }
 
