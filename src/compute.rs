@@ -24,6 +24,9 @@ pub struct ComplexNum {
     i: f64,
 }
 
+// Impl Rem, Neg, Clone, Copy, Default, Debug, Display, Sum, Product,
+// Send, Sync, Unpin, UnwindSafe, RefUnwindSafe, AddAssign, Sized, From<i32>,
+// From<f32>
 impl Add for ComplexNum {
     type Output = ComplexNum;
 
