@@ -131,13 +131,29 @@ pub struct FuncNum<T: Number> {
     len: i32,
 }
 
+pub struct FuncCont<F>
+    where
+        F: Fn(f64) -> f64,
+    {
+        closure: F,
+        body: FuncBody,
+    }
+
+// impl<F: Fn(f64)> FuncCont<F> {
+//     pub fn new(func: FuncBody) -> Result<Self> {
+//         let closure = func_continuous(func);
+//         // Test if closure return NAN from 1 to see if failed
+//         Ok(Self {closure, func})
+//     }
+// }
+
 // Make this form a real function closure from the string
 pub fn func_continuous(func: FuncBody) -> impl Fn(f64) -> f64 {
     move |x| x * x
 }
 
 impl<T: Number> Mtx<T> {
-    fn new(m: usize, n: usize) -> Result<Self> {
+    pub fn new(m: usize, n: usize) -> Result<Self> {
         // let a = Vec::<f64>::with_capacity(shape[0] * shape[1])
         let mut elem = Vec::<T>::new();
         elem.try_reserve(m * n)?;

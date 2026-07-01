@@ -20,3 +20,4 @@ fn plot_func<F: Fn()>(res: Resolution, f: F) -> Result<RgbaImage> {
 
 // save image with imgbuff.save("name.ext")?;
 
+// Try loading an image as a Mtx and doing math with it
