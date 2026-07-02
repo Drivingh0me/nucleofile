@@ -1,6 +1,11 @@
 use crate::error::Result;
 use std::io::{self, Write};
 
+// Rules:
+// Set a variable with "let x = word".
+// Let parenthases group things.
+// Use @folder/file.ext to use a file.
+
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
     let mut input = String::new();
@@ -40,6 +45,11 @@ pub fn run_interpreter() -> Result<()> {
     }
 
     Ok(())
+}
+
+// Accept two vectors from the user and do an operation with them
+fn tool_vec_multiply(vector1: &str, vector2: &str) {
+    todo!();
 }
 
 fn print_input_arrow(std_out: &mut io::Stdout) -> Result<()> {

@@ -128,7 +128,7 @@ pub struct FuncBody {
 pub struct FuncNum<T: Number> {
     x: Vec<T>,
     y: Vec<T>,
-    len: i32,
+    len: usize,
 }
 
 pub struct FuncCont<F>
