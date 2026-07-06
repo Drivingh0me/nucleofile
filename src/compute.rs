@@ -83,6 +83,7 @@ pub trait Number:
     + From<i32>
     + From<f32>
     + AddAssign
+    + std::fmt::Display
 {}
 
 impl<T> Number for T where
@@ -95,6 +96,7 @@ impl<T> Number for T where
         + From<i32>
         + From<f32>
         + AddAssign
+        + std::fmt::Display
 {}
 
 pub struct Point<T: Number> {
@@ -188,8 +190,8 @@ impl<T: Number> Mtx<T> {
 
 // Determines |u><v|
 fn outer_product<T: Number>(
-    u: Vec<T>,
-    v: Vec<T>) -> Result<Mtx<T>> {
+    u: &Vec<T>,
+    v: &Vec<T>) -> Result<Mtx<T>> {
     let m: usize = u.len();
     let n: usize = v.len();
     let mut a = Mtx::new(m, n)?;
@@ -205,9 +207,9 @@ fn outer_product<T: Number>(
 
 // Finds single element of |u><v|
 fn outer_product_elem<T: Number>(
-    u: Vec<T>,
-    v: Vec<T>,
-    e: Element) -> Result<T> {
+    u: &Vec<T>,
+    v: &Vec<T>,
+    e: &Element) -> Result<T> {
     if e.i > u.len() || e.j > v.len() {
         return Err(Error::MtxBounds);
     }
@@ -216,7 +218,7 @@ fn outer_product_elem<T: Number>(
 }
 
 // Determines <u|v>
-fn inner_product<T: Number>(u: Vec<T>, v: Vec<T>) -> Result<T> {
+fn inner_product<T: Number>(u: &Vec<T>, v: &Vec<T>) -> Result<T> {
     if u.len() != v.len() {
         return Err(Error::VectorSize);
     }
@@ -230,7 +232,7 @@ fn inner_product<T: Number>(u: Vec<T>, v: Vec<T>) -> Result<T> {
 }
 
 // Explicit kronecker product A{OX}B
-fn knonecker_product<T: Number>(a: Mtx<T>, b: Mtx<T>) -> Result<Mtx<T>> {
+fn knonecker_product<T: Number>(a: &Mtx<T>, b: &Mtx<T>) -> Result<Mtx<T>> {
     let m: usize = a.m * b.m;
     let n: usize = a.n * b.n;
 
@@ -247,11 +249,30 @@ fn knonecker_product<T: Number>(a: Mtx<T>, b: Mtx<T>) -> Result<Mtx<T>> {
 
 // Lazy calculates (i, j) elem of kronecker product
 fn knonecker_product_elem<T: Number>(
-    a: Mtx<T>,
-    b: Mtx<T>,
-    e: Element) -> Result<T> {
+    a: &Mtx<T>,
+    b: &Mtx<T>,
+    e: &Element) -> Result<T> {
 
     Ok(T::from(0))
+}
+
+pub fn printable_object<T: Number>(mtx: &Mtx<T>) -> Result<Vec<String>> {
+    let mut printable: Vec<String> = Vec::new();
+    let mut i: usize = 0;
+
+    for m in 0..mtx.m {
+        for n in 0..mtx.n {
+            printable.push(
+                mtx.elem
+                    .get(i)
+                    .ok_or(Error::MtxBounds)?
+                    .to_string());
+            i += 1;
+        }
+        printable.push(String::from("\n"));
+    }
+
+    Ok(printable)
 }
 
 #[cfg(test)]
