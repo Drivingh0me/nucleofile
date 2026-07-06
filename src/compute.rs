@@ -189,7 +189,7 @@ impl<T: Number> Mtx<T> {
 }
 
 // Determines |u><v|
-fn outer_product<T: Number>(
+pub fn outer_product<T: Number>(
     u: &Vec<T>,
     v: &Vec<T>) -> Result<Mtx<T>> {
     let m: usize = u.len();
@@ -206,7 +206,7 @@ fn outer_product<T: Number>(
 }
 
 // Finds single element of |u><v|
-fn outer_product_elem<T: Number>(
+pub fn outer_product_elem<T: Number>(
     u: &Vec<T>,
     v: &Vec<T>,
     e: &Element) -> Result<T> {

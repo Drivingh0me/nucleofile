@@ -1,5 +1,6 @@
 use crate::error::Result;
 use std::io::{self, Write};
+use crate::compute;
 
 // Rules:
 // Set a variable with "let x = word".
@@ -48,8 +49,17 @@ pub fn run_interpreter() -> Result<()> {
 }
 
 // Accept two vectors from the user and do an operation with them
-fn tool_vec_multiply(vector1: &str, vector2: &str) {
-    todo!();
+fn tool_vec_multiply(vector1: &str, vector2: &str) -> Result<Vec<String>> {
+    let vector1: Vec<f64> = vector1.split(' ')
+        .map(|x| x.parse::<f64>().unwrap_or(f64::NAN))
+        .collect();
+    let vector2: Vec<f64> = vector2.split(' ')
+        .map(|x| x.parse::<f64>().unwrap_or(f64::NAN))
+        .collect();
+
+    let answer = compute::outer_product(&vector1, &vector2)?;
+    let answer = compute::printable_object(&answer)?;
+    Ok(answer)
 }
 
 fn print_input_arrow(std_out: &mut io::Stdout) -> Result<()> {
