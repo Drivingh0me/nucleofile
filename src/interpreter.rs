@@ -42,6 +42,21 @@ pub fn run_interpreter() -> Result<()> {
                     .collect();
                 print_response(&mut stdout, &response)?;
             }
+            if *word == "test" {
+                let vectors: Vec<&str> = words
+                    .into_iter()
+                    .skip(1)
+                    .collect();
+                let mut vector1: Vec<&str> = vectors.split(|&x| x == "x");
+                let vector2: Vec<&str> = words
+                    .into_iter()
+                    .skip(1)
+                    .collect();
+                let product: Vec<String> = tool_vec_multiply(
+                    vector1,
+                    vector2)?;
+                print_response(&mut stdout, &product)?;
+            }
         }
     }
 
