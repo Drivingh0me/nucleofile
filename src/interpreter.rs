@@ -13,6 +13,11 @@ use crate::compute;
 // Build Mtx with M[a1,a2,a3;b1,b2,b3;c1,c2,c3].
 // Build Tns with T[a1,a2;b1,b2;;c1,c2;d1,d2].
 
+// Order of operations:
+// Check for exact match commands ->
+// Sub vaiables -> Perform actions/tools in order -> Simplify words with,
+// results from actions/tools -> Enact keywords.
+
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
     let mut input = String::new();
@@ -51,21 +56,21 @@ pub fn run_interpreter() -> Result<()> {
                     .collect();
                 print_response(&mut stdout, &response)?;
             }
-            if *word == "test" {
-                let vectors: Vec<&str> = words
-                    .into_iter()
-                    .skip(1)
-                    .collect();
-                let mut vector1: Vec<&str> = vectors.split(|&x| x == "x");
-                let vector2: Vec<&str> = words
-                    .into_iter()
-                    .skip(1)
-                    .collect();
-                let product: Vec<String> = tool_vec_multiply(
-                    vector1,
-                    vector2)?;
-                print_response(&mut stdout, &product)?;
-            }
+            // if *word == "test" {
+            //     let vectors: Vec<&str> = words
+            //         .into_iter()
+            //         .skip(1)
+            //         .collect();
+            //     let mut vector1: Vec<&str> = vectors.split(|&x| x == "x");
+            //     let vector2: Vec<&str> = words
+            //         .into_iter()
+            //         .skip(1)
+            //         .collect();
+            //     let product: Vec<String> = tool_vec_multiply(
+            //         vector1,
+            //         vector2)?;
+            //     print_response(&mut stdout, &product)?;
+            // }
         }
     }
 
