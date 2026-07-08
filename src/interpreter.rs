@@ -25,7 +25,7 @@ pub fn run_interpreter() -> Result<()> {
     let mut words: Vec<&str> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
     let mut variables: Vec<String> = Vec::new();
-    let mut variable_table: HashMap<&str, &str> = HashMap::new();
+    let mut variable_dict: HashMap<&str, &str> = HashMap::new();
 
     // REPL
     loop {
@@ -49,7 +49,7 @@ pub fn run_interpreter() -> Result<()> {
 
         words = input.split(' ').collect();
         // Variable substitution
-        if let Some(fake_var) = sub_variables(&variable_table, &mut words) {
+        if let Some(fake_var) = sub_variables(&variable_dict, &mut words) {
             let var_warning: String = String::from(
                 "\x1b[31mUndefined variable:"
             );
@@ -101,19 +101,26 @@ fn set_variables(
 }
 
 fn sub_variables(
-    variables: &[&str],
-    words: &[&str]) -> Option<&str> {
-    // Find all &str starting with @ char.
-
-    let var_name: &str = ignore_first_char(var_name);
+    variables_dict: &[&str],
+    words: &mut [&str]) -> Result<()> {
+    let words: Vec<&str> = words.iter_mut()
+        .map(|word| {
+            if word.starts_with('@') {
+                // Make this return Some(word)
+                variables_dict.get(word).copied()?
+            } else {
+                word
+            }
+        }).collect();
+    Ok(())
 }
 
-fn ignore_first_char(s: &str) -> &str {
-    match s.chars().next() {
-        Some(c) => &s[c.len_utf8()..],
-        None => "",
-    }
-}
+// fn ignore_first_char(s: &str) -> &str {
+//     match s.chars().next() {
+//         Some(c) => &s[c.len_utf8()..],
+//         None => "",
+//     }
+// }
 
 // Accept two vectors from the user and do an operation with them.
 fn tool_vec_multiply(vector1: &str, vector2: &str) -> Result<Vec<String>> {
