@@ -49,8 +49,10 @@ pub fn run_interpreter() -> Result<()> {
 
         words = input.split(' ').collect();
         // Variable substitution
-        set_variables(&variables, &variable_table, &words)?;
-        sub_variables(&variable_table, &words)?;
+        if let Some(fake_var) = sub_variables(&variable_table, &words) {
+            let not_a_var: Vec<&str> = prepare_not_a_var(&fake_var);
+            print_response(&mut stdout, &not_a_var)?;
+        }
 
 
         // Must be first word tools.
@@ -61,6 +63,7 @@ pub fn run_interpreter() -> Result<()> {
                     .skip(1)
                     .collect();
                 print_response(&mut stdout, &response)?;
+                continue;
             }
             if *word == "let" {
                 let expression: Vec<&str> = words
@@ -68,6 +71,7 @@ pub fn run_interpreter() -> Result<()> {
                     .skip(1)
                     .collect();
                 set_variables(&variables, &variable_table, &expression)?;
+                continue;
             }
         }
     }
@@ -75,13 +79,21 @@ pub fn run_interpreter() -> Result<()> {
     Ok(())
 }
 
+fn prepare_not_a_var(nonexistent_var: &str) -> Vec<&str> {
+    todo!()
+}
 
-fn set_variables(&variables, &variable_table, &expression) -> Result<()> {
+fn set_variables(
+    variables: &Vec<&str>,
+    variable_table: &Vec<&str>,
+    expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
     todo!()
 }
 
-fn sub_variables(&variables, &words) -> Result<()> {
+fn sub_variables(
+    variables: &[&str],
+    words: &[&str]) -> Result<()> {
     todo!()
 }
 
