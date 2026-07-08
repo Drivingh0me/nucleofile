@@ -49,9 +49,19 @@ pub fn run_interpreter() -> Result<()> {
 
         words = input.split(' ').collect();
         // Variable substitution
-        if let Some(fake_var) = sub_variables(&variable_table, &words) {
-            let not_a_var: Vec<&str> = prepare_not_a_var(&fake_var);
+        if let Some(fake_var) = sub_variables(&variable_table, &mut words) {
+            let var_warning: String = String::from(
+                "\x1b[31mUndefined variable:"
+            );
+            let reset_color: String = String::from(
+                "\x1b[0m"
+            );
+            let not_a_var: Vec<&str> = Vec::new();
+            not_a_var.push(&var_warning);
+            not_a_var.push(fake_var);
+            not_a_var.push(&reset_color);
             print_response(&mut stdout, &not_a_var)?;
+            continue;
         }
 
 
@@ -70,17 +80,16 @@ pub fn run_interpreter() -> Result<()> {
                     .into_iter()
                     .skip(1)
                     .collect();
-                set_variables(&variables, &variable_table, &expression)?;
+                set_variables(
+                    &mut variables,
+                    &mut variable_table,
+                    &expression
+                )?;
                 continue;
             }
         }
     }
-
     Ok(())
-}
-
-fn prepare_not_a_var(nonexistent_var: &str) -> Vec<&str> {
-    todo!()
 }
 
 fn set_variables(
@@ -93,7 +102,7 @@ fn set_variables(
 
 fn sub_variables(
     variables: &[&str],
-    words: &[&str]) -> Result<()> {
+    words: &[&str]) -> Option<&str> {
     todo!()
 }
 
