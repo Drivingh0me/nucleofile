@@ -103,7 +103,16 @@ fn set_variables(
 fn sub_variables(
     variables: &[&str],
     words: &[&str]) -> Option<&str> {
-    todo!()
+    // Find all &str starting with @ char.
+
+    let var_name: &str = ignore_first_char(var_name);
+}
+
+fn ignore_first_char(s: &str) -> &str {
+    match s.chars().next() {
+        Some(c) => &s[c.len_utf8()..],
+        None => "",
+    }
 }
 
 // Accept two vectors from the user and do an operation with them.
