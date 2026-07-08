@@ -6,6 +6,12 @@ use crate::compute;
 // Set a variable with "let x = word".
 // Let parenthases group things.
 // Use @folder/file.ext to use a file.
+// Use $ to dereference a variable. Eg. var = 2134\n $var * 222\n.
+// Use # to comment rest of line.
+// Build Vec with [x1,x2,x3] WITH NO SPACES. Begining with c makes column Vec,
+//     Eg. c[x1,y1,z1]. Can also do r[x1], but r is assumed.
+// Build Mtx with M[a1,a2,a3;b1,b2,b3;c1,c2,c3].
+// Build Tns with T[a1,a2;b1,b2;;c1,c2;d1,d2].
 
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
@@ -13,6 +19,7 @@ pub fn run_interpreter() -> Result<()> {
     let mut words: Vec<&str> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
 
+    // REPL
     loop {
         print_input_arrow(&mut stdout)?;
         input.clear();
@@ -33,6 +40,8 @@ pub fn run_interpreter() -> Result<()> {
         }
 
         words = input.split(' ').collect();
+        // Do variable substitution here?
+
 
         if let Some(word) = words.get(0) {
             if *word == "echo" {
