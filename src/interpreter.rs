@@ -1,6 +1,7 @@
 use crate::error::Result;
 use std::io::{self, Write};
 use crate::compute;
+use std::collections::HashMap;
 
 // Rules:
 // Set a variable with "let x = word".
@@ -23,6 +24,8 @@ pub fn run_interpreter() -> Result<()> {
     let mut input = String::new();
     let mut words: Vec<&str> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
+    let mut variables: Vec<String> = Vec::new();
+    let mut variable_table: HashMap<&str, &str> = HashMap::new();
 
     // REPL
     loop {
@@ -45,9 +48,12 @@ pub fn run_interpreter() -> Result<()> {
         }
 
         words = input.split(' ').collect();
-        // Do variable substitution here?
+        // Variable substitution
+        set_variables(&variables, &variable_table, &words)?;
+        sub_variables(&variable_table, &words)?;
 
 
+        // Must be first word tools.
         if let Some(word) = words.get(0) {
             if *word == "echo" {
                 let response: Vec<&str> = words
@@ -56,28 +62,30 @@ pub fn run_interpreter() -> Result<()> {
                     .collect();
                 print_response(&mut stdout, &response)?;
             }
-            // if *word == "test" {
-            //     let vectors: Vec<&str> = words
-            //         .into_iter()
-            //         .skip(1)
-            //         .collect();
-            //     let mut vector1: Vec<&str> = vectors.split(|&x| x == "x");
-            //     let vector2: Vec<&str> = words
-            //         .into_iter()
-            //         .skip(1)
-            //         .collect();
-            //     let product: Vec<String> = tool_vec_multiply(
-            //         vector1,
-            //         vector2)?;
-            //     print_response(&mut stdout, &product)?;
-            // }
+            if *word == "let" {
+                let expression: Vec<&str> = words
+                    .into_iter()
+                    .skip(1)
+                    .collect();
+                set_variables(&variables, &variable_table, &expression)?;
+            }
         }
     }
 
     Ok(())
 }
 
-// Accept two vectors from the user and do an operation with them
+
+fn set_variables(&variables, &variable_table, &expression) -> Result<()> {
+    // expression must be: x = y, where y can be evaluated by tools.
+    todo!()
+}
+
+fn sub_variables(&variables, &words) -> Result<()> {
+    todo!()
+}
+
+// Accept two vectors from the user and do an operation with them.
 fn tool_vec_multiply(vector1: &str, vector2: &str) -> Result<Vec<String>> {
     let vector1: Vec<f64> = vector1.split(' ')
         .map(|x| x.parse::<f64>().unwrap_or(f64::NAN))
