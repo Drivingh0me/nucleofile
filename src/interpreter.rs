@@ -22,7 +22,7 @@ use std::collections::HashMap;
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
     let mut input = String::new();
-    let mut words: Vec<&str> = Vec::with_capacity(32);
+    let mut words: Vec<String> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
     let mut variables: Vec<String> = Vec::new();
     let mut variable_dict: HashMap<&str, &str> = HashMap::new();
@@ -47,7 +47,9 @@ pub fn run_interpreter() -> Result<()> {
             continue;
         }
 
-        words = input.split(' ').collect();
+        words = input.split(' ')
+            .map(|s| s.to_string())
+            .collect();
         // Variable substitution
         if let Some(()) = sub_variables(&variable_dict, &mut words) {
             let var_warning: String = String::from(
@@ -58,7 +60,7 @@ pub fn run_interpreter() -> Result<()> {
             );
             let mut not_a_var: Vec<&str> = Vec::new();
             not_a_var.push(&var_warning);
-            not_a_var.append(&mut words);
+            not_a_var.extend(words.iter().map(|s| s.as_str()));
             not_a_var.push(&reset_color);
             print_response(&mut stdout, &not_a_var)?;
             continue;
@@ -118,7 +120,7 @@ fn set_variables<'a>(
 
 fn sub_variables(
     variable_dict: &HashMap<&str, &str>,
-    words: &mut Vec<&str>) -> Option<()> {
+    words: &mut Vec<String>) -> Option<()> {
     // If Some(), words is list of nonexistent variables.
     let mut all_vars_exist: bool = true;
     for word in words.iter_mut() {
