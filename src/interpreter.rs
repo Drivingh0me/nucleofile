@@ -49,16 +49,16 @@ pub fn run_interpreter() -> Result<()> {
 
         words = input.split(' ').collect();
         // Variable substitution
-        if let Some(not_var) = sub_variables(&variable_dict, &mut words) {
+        if let Some(()) = sub_variables(&variable_dict, &mut words) {
             let var_warning: String = String::from(
                 "\x1b[31mUndefined variable:"
             );
             let reset_color: String = String::from(
                 "\x1b[0m"
             );
-            let not_a_var: Vec<&str> = Vec::new();
+            let mut not_a_var: Vec<&str> = Vec::new();
             not_a_var.push(&var_warning);
-            not_a_var.push(not_var);
+            not_a_var.append(&mut words);
             not_a_var.push(&reset_color);
             print_response(&mut stdout, &not_a_var)?;
             continue;
@@ -92,9 +92,9 @@ pub fn run_interpreter() -> Result<()> {
     Ok(())
 }
 
-fn set_variables(
-    variables: &mut Vec<&str>,
-    variable_dict: &mut HashMap<&str, &str>,
+fn set_variables<'a>(
+    variables: &'a mut Vec<String>,
+    variable_dict: &'a mut HashMap<&'a str, &str>,
     expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
     let key = match expression.get(0) {
@@ -107,25 +107,36 @@ fn set_variables(
         None => return Err(Error::ItemNotFound(String::from("No key"))),
     };
 
+    variables.push(String::from(*key));
+    let key: &str = variables.last().unwrap().as_str();
+    variables.push(String::from(*val));
+    let val: &str = variables.last().unwrap().as_str();
+
     variable_dict.insert(key, val);
     Ok(())
 }
 
-fn sub_variables<'a>(
-    variable_dict: &'a HashMap<&str, &str>,
-    words: &'a mut Vec<&str>) -> Option<&'a str> {
-    words = words.iter_mut()
-        .map(|word| {
-            if word.starts_with('@') {
-                match variable_dict.get(word) {
-                    Some(var) => var,
-                    None => return Some(word),
-                }
+fn sub_variables(
+    variable_dict: &HashMap<&str, &str>,
+    words: &mut Vec<&str>) -> Option<()> {
+    // If Some(), words is list of nonexistent variables.
+    let mut all_vars_exist: bool = true;
+    for word in words.iter_mut() {
+        if word.starts_with('@') {
+            if let Some(value) = variable_dict.get(word) {
+                *word = value;
             } else {
-                word
+                all_vars_exist = false;
             }
-        }).collect();
-    None
+        }
+    }
+
+    if all_vars_exist {
+        return None;
+    }
+
+    words.retain(|s| s.starts_with('@'));
+    Some(())
 }
 
 // Accept two vectors from the user and do an operation with them.
