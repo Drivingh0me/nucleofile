@@ -18,6 +18,8 @@ pub enum Error {
     VectorSize,
     #[error("Element out of bounds")]
     MtxBounds,
+    #[error("Item Not Found")]
+    ItemNotFound(String),
     #[cfg(feature = "gui")]
     #[error("Eframe error: {0}")]
     Eframe(#[from] eframe::Error),

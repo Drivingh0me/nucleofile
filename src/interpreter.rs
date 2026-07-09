@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::error::{Result, Error};
 use std::io::{self, Write};
 use crate::compute;
 use std::collections::HashMap;
@@ -49,7 +49,7 @@ pub fn run_interpreter() -> Result<()> {
 
         words = input.split(' ').collect();
         // Variable substitution
-        if let Some(fake_var) = sub_variables(&variable_dict, &mut words) {
+        if let Some(not_var) = sub_variables(&variable_dict, &mut words) {
             let var_warning: String = String::from(
                 "\x1b[31mUndefined variable:"
             );
@@ -58,7 +58,7 @@ pub fn run_interpreter() -> Result<()> {
             );
             let not_a_var: Vec<&str> = Vec::new();
             not_a_var.push(&var_warning);
-            not_a_var.push(fake_var);
+            not_a_var.push(not_var);
             not_a_var.push(&reset_color);
             print_response(&mut stdout, &not_a_var)?;
             continue;
@@ -82,7 +82,7 @@ pub fn run_interpreter() -> Result<()> {
                     .collect();
                 set_variables(
                     &mut variables,
-                    &mut variable_table,
+                    &mut variable_dict,
                     &expression
                 )?;
                 continue;
@@ -93,34 +93,40 @@ pub fn run_interpreter() -> Result<()> {
 }
 
 fn set_variables(
-    variables: &Vec<&str>,
-    variable_table: &Vec<&str>,
+    variables: &mut Vec<&str>,
+    variable_dict: &mut HashMap<&str, &str>,
     expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
-    todo!()
+    let key = match expression.get(0) {
+        Some(k) => k,
+        None => return Err(Error::ItemNotFound(String::from("No key"))),
+    };
+
+    let val = match expression.get(2) {
+        Some(v) => v,
+        None => return Err(Error::ItemNotFound(String::from("No key"))),
+    };
+
+    variable_dict.insert(key, val);
+    Ok(())
 }
 
-fn sub_variables(
-    variables_dict: &[&str],
-    words: &mut [&str]) -> Result<()> {
-    let words: Vec<&str> = words.iter_mut()
+fn sub_variables<'a>(
+    variable_dict: &'a HashMap<&str, &str>,
+    words: &'a mut Vec<&str>) -> Option<&'a str> {
+    words = words.iter_mut()
         .map(|word| {
             if word.starts_with('@') {
-                // Make this return Some(word)
-                variables_dict.get(word).copied()?
+                match variable_dict.get(word) {
+                    Some(var) => var,
+                    None => return Some(word),
+                }
             } else {
                 word
             }
         }).collect();
-    Ok(())
+    None
 }
-
-// fn ignore_first_char(s: &str) -> &str {
-//     match s.chars().next() {
-//         Some(c) => &s[c.len_utf8()..],
-//         None => "",
-//     }
-// }
 
 // Accept two vectors from the user and do an operation with them.
 fn tool_vec_multiply(vector1: &str, vector2: &str) -> Result<Vec<String>> {
