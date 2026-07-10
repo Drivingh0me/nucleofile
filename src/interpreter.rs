@@ -24,8 +24,7 @@ pub fn run_interpreter() -> Result<()> {
     let mut input = String::new();
     let mut words: Vec<String> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
-    let mut variables: Vec<String> = Vec::new();
-    let mut variable_dict: HashMap<&str, &str> = HashMap::new();
+    let mut variable_dict: HashMap<String, String> = HashMap::new();
 
     // REPL
     loop {
@@ -56,7 +55,7 @@ pub fn run_interpreter() -> Result<()> {
                 "\x1b[31mUndefined variable:"
             );
             let reset_color: String = String::from(
-                "\x1b[0m"
+                "\x1b[0m\n"
             );
             let mut not_a_var: Vec<&str> = Vec::new();
             not_a_var.push(&var_warning);
@@ -71,22 +70,24 @@ pub fn run_interpreter() -> Result<()> {
         if let Some(word) = words.get(0) {
             if *word == "echo" {
                 let response: Vec<&str> = words
-                    .into_iter()
+                    .iter()
                     .skip(1)
+                    .map(String::as_str)
                     .collect();
                 print_response(&mut stdout, &response)?;
                 continue;
             }
             if *word == "let" {
                 let expression: Vec<&str> = words
-                    .into_iter()
+                    .iter()
                     .skip(1)
+                    .map(String::as_str)
                     .collect();
                 set_variables(
-                    &mut variables,
                     &mut variable_dict,
                     &expression
                 )?;
+                dbg!(&variable_dict);
                 continue;
             }
         }
@@ -95,8 +96,7 @@ pub fn run_interpreter() -> Result<()> {
 }
 
 fn set_variables<'a>(
-    variables: &'a mut Vec<String>,
-    variable_dict: &'a mut HashMap<&'a str, &str>,
+    variable_dict: &'a mut HashMap<String, String>,
     expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
     let key = match expression.get(0) {
@@ -105,28 +105,27 @@ fn set_variables<'a>(
     };
 
     let val = match expression.get(2) {
-        Some(v) => v,
+        Some(v) => v.trim_end(),
         None => return Err(Error::ItemNotFound(String::from("No key"))),
     };
 
-    variables.push(String::from(*key));
-    let key: &str = variables.last().unwrap().as_str();
-    variables.push(String::from(*val));
-    let val: &str = variables.last().unwrap().as_str();
-
-    variable_dict.insert(key, val);
+    variable_dict.insert(key.to_string(), val.to_string());
     Ok(())
 }
 
 fn sub_variables(
-    variable_dict: &HashMap<&str, &str>,
+    variable_dict: &HashMap<String, String>,
     words: &mut Vec<String>) -> Option<()> {
     // If Some(), words is list of nonexistent variables.
     let mut all_vars_exist: bool = true;
     for word in words.iter_mut() {
         if word.starts_with('@') {
-            if let Some(value) = variable_dict.get(word) {
-                *word = value;
+            let key: &str = match word.chars().next() {
+                Some(c) => &word[c.len_utf8()..],
+                None => "",
+            };
+            if let Some(value) = variable_dict.get(key) {
+                *word = value.to_string();
             } else {
                 all_vars_exist = false;
             }
