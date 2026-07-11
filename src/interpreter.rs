@@ -87,7 +87,7 @@ pub fn run_interpreter() -> Result<()> {
                     &mut variable_dict,
                     &expression
                 )?;
-                dbg!(&variable_dict);
+                // dbg!(&variable_dict);
                 continue;
             }
         }
@@ -99,17 +99,23 @@ fn set_variables<'a>(
     variable_dict: &'a mut HashMap<String, String>,
     expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
+    // y can have spaces. must have spaces between x and + and y.
+    // x must have no spaces.
+    valid_assignment(&expression)?;
     let key = match expression.get(0) {
         Some(k) => k,
         None => return Err(Error::ItemNotFound(String::from("No key"))),
     };
 
-    let val = match expression.get(2) {
-        Some(v) => v.trim_end(),
-        None => return Err(Error::ItemNotFound(String::from("No key"))),
-    };
+    let val: String = expression[2..].join(" ").trim_end().to_string();
 
-    variable_dict.insert(key.to_string(), val.to_string());
+    // let val = match expression.get(2) {
+    //     Some(v) => v.trim_end(),
+    //     None => return Err(Error::ItemNotFound(String::from("No key"))),
+    // };
+    // variable_dict.insert(key.to_string(), val.to_string());
+
+    variable_dict.insert(key.to_string(), val);
     Ok(())
 }
 
@@ -121,7 +127,7 @@ fn sub_variables(
     for word in words.iter_mut() {
         if word.starts_with('@') {
             let key: &str = match word.chars().next() {
-                Some(c) => &word[c.len_utf8()..],
+                Some(c) => &word[c.len_utf8()..].trim_end(),
                 None => "",
             };
             if let Some(value) = variable_dict.get(key) {
@@ -138,6 +144,18 @@ fn sub_variables(
 
     words.retain(|s| s.starts_with('@'));
     Some(())
+}
+
+fn valid_assignment(expression: &Vec<&str>) -> Result<()> {
+    match expression.get(1) {
+        Some(&"=") => Ok(()),
+        Some(other) => Err(
+            Error::ItemNotFound(String::from("No assignment"))
+        ),
+        None => Err(
+            Error::ItemNotFound(String::from("No assignment"))
+        ),
+    }
 }
 
 // Accept two vectors from the user and do an operation with them.
