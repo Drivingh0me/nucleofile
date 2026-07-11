@@ -47,7 +47,7 @@ pub fn run_interpreter() -> Result<()> {
         }
 
         words = input.split(' ')
-            .map(|s| s.to_string())
+            .map(|s| s.trim_end().to_string())
             .collect();
         // Variable substitution
         if let Some(()) = sub_variables(&variable_dict, &mut words) {
@@ -69,11 +69,12 @@ pub fn run_interpreter() -> Result<()> {
         // Must be first word tools.
         if let Some(word) = words.get(0) {
             if *word == "echo" {
-                let response: Vec<&str> = words
+                let mut response: Vec<&str> = words
                     .iter()
                     .skip(1)
                     .map(String::as_str)
                     .collect();
+                response.push("\n");
                 print_response(&mut stdout, &response)?;
                 continue;
             }
