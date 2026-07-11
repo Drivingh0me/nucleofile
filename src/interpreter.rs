@@ -19,16 +19,23 @@ use std::collections::HashMap;
 // Sub vaiables -> Perform actions/tools in order -> Simplify words with,
 // results from actions/tools -> Enact keywords.
 
-// Instead of variable dict<String, String> doo dict<String, &Data>
-// Where data has a printable String that can be used to view.
-// This also requires a DataSet<Data> unless the dict owns the data.
+struct Data {
+    printable: String,
+}
+
+impl Data {
+    fn new() -> Self {
+        let printable = String::new();
+        Self{printable}
+    }
+}
 
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
     let mut input = String::new();
     let mut words: Vec<String> = Vec::with_capacity(32);
     let mut input_bytes: usize = 0;
-    let mut variable_dict: HashMap<String, String> = HashMap::new();
+    let mut variable_dict: HashMap<String, Data> = HashMap::new();
 
     // REPL
     loop {
@@ -101,7 +108,7 @@ pub fn run_interpreter() -> Result<()> {
 }
 
 fn set_variables<'a>(
-    variable_dict: &'a mut HashMap<String, String>,
+    variable_dict: &'a mut HashMap<String, Data>,
     expression: &Vec<&str>) -> Result<()> {
     // expression must be: x = y, where y can be evaluated by tools.
     // y can have spaces. must have spaces between x and + and y.
@@ -112,20 +119,16 @@ fn set_variables<'a>(
         None => return Err(Error::ItemNotFound(String::from("No key"))),
     };
 
+    let mut data_val: Data = Data::new();
     let val: String = expression[2..].join(" ").trim_end().to_string();
+    data_val.printable = val;
 
-    // let val = match expression.get(2) {
-    //     Some(v) => v.trim_end(),
-    //     None => return Err(Error::ItemNotFound(String::from("No key"))),
-    // };
-    // variable_dict.insert(key.to_string(), val.to_string());
-
-    variable_dict.insert(key.to_string(), val);
+    variable_dict.insert(key.to_string(), data_val);
     Ok(())
 }
 
 fn sub_variables(
-    variable_dict: &HashMap<String, String>,
+    variable_dict: &HashMap<String, Data>,
     words: &mut Vec<String>) -> Option<()> {
     // If Some(), words is list of nonexistent variables.
     let mut all_vars_exist: bool = true;
@@ -136,7 +139,7 @@ fn sub_variables(
                 None => "",
             };
             if let Some(value) = variable_dict.get(key) {
-                *word = value.to_string();
+                *word = value.printable.to_string();
             } else {
                 all_vars_exist = false;
             }
