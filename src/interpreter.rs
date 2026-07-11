@@ -19,6 +19,10 @@ use std::collections::HashMap;
 // Sub vaiables -> Perform actions/tools in order -> Simplify words with,
 // results from actions/tools -> Enact keywords.
 
+// Instead of variable dict<String, String> doo dict<String, &Data>
+// Where data has a printable String that can be used to view.
+// This also requires a DataSet<Data> unless the dict owns the data.
+
 pub fn run_interpreter() -> Result<()> {
     let mut stdout = io::stdout();
     let mut input = String::new();
