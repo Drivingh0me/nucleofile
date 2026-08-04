@@ -7,15 +7,15 @@ pub fn run_gui() -> Result<()> {
     eframe::run_native(
         "eframe Test",
         native_options,
-        Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc))))
+        Box::new(|cc| Ok(Box::new(AppState::new(cc))))
     );
     Ok(())
 }
 
 #[derive(Default)]
-struct MyEguiApp {}
+struct AppState {}
 
-impl MyEguiApp {
+impl AppState {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // Customize egui here with cc.egui_ctx.set_fonts and
         // cc.egui_ctx.set_global_style.
@@ -28,7 +28,7 @@ impl MyEguiApp {
     }
 }
 
-impl eframe::App for MyEguiApp {
+impl eframe::App for AppState {
    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
        egui::CentralPanel::default().show_inside(ui, |ui| {
            ui.heading("Hello World!");
