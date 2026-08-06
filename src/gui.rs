@@ -13,7 +13,10 @@ pub fn run_gui() -> Result<()> {
 }
 
 #[derive(Default)]
-struct AppState {}
+struct AppState {
+    label: String,
+    value: f32,
+}
 
 impl AppState {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
@@ -29,10 +32,34 @@ impl AppState {
 }
 
 impl eframe::App for AppState {
-   fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
-       egui::CentralPanel::default().show_inside(ui, |ui| {
-           ui.heading("Hello World!");
-       });
-   }
+    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+        egui::Panel::top("top_panel").show_inside(ui, |ui| {
+            egui::MenuBar::new().ui(ui, |ui| {
+                ui.menu_button("file", |ui| {
+                    if ui.button("Quit").clicked() {
+                        ui.send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+                });
+                ui.add_space(16.0);
+                // egui::widgets::global_theme_preference_buttons(ui);
+            });
+        });
+
+        egui::CentralPanel::default().show_inside(ui, |ui| {
+            ui.heading("Hello World!");
+
+            ui.horizontal(|ui| {
+                ui.label("write something: ");
+                ui.text_edit_singleline(&mut self.label);
+            });
+
+            ui.add(egui::Slider::new(
+                &mut self.value,
+                0.0..=10.0).text("value"));
+            if ui.button("Increment").clicked() {
+                self.value += 1.0;
+            }
+        });
+    }
 }
 
