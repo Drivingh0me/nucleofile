@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     let args: cli::Params = cli::get_args()?;
 
     #[cfg(feature = "gui")]
-    gui::run_gui()?;
+    gui::run_gui().unwrap();
 
     #[cfg(not(feature = "gui"))]
     interpreter::run_interpreter()?;

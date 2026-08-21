@@ -1,7 +1,11 @@
-use eframe::egui;
+use eframe::{egui, egui_wgpu};
 use std::sync::Arc;
+use eframe::wgpu;
 
-use crate::error::Result;
+// Triangle render and viewport was directly implemented with AI.
+
+// Using standard error boxing or your custom crate::error::Result
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 pub fn run_gui() -> Result<()> {
     let icon = image::load_from_memory(include_bytes!("../assets/icon.png"))
@@ -17,21 +21,49 @@ pub fn run_gui() -> Result<()> {
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-        .with_inner_size([640.0, 480.0])
+            .with_inner_size([800.0, 600.0])
             .with_icon(Arc::new(icon)),
+        renderer: eframe::Renderer::Wgpu, // Force wgpu backend
         ..Default::default()
     };
 
-    let native_options = eframe::NativeOptions::default();
     eframe::run_native(
-        "eframe Test",
+        "ChemDraw - wgpu Render Viewport",
         options,
-        Box::new(|cc| Ok(Box::new(AppState::new(cc))))
-    );
-    Ok(())
+        Box::new(|cc| Ok(Box::new(AppState::new(cc)))),
+    )
+    .map_err(|e| e.into())
 }
 
-#[derive(Default)]
+// Custom wgpu callback structure stored in egui Resources
+struct TriangleRenderCallback {
+    pipeline: wgpu::RenderPipeline,
+}
+
+impl egui_wgpu::CallbackTrait for TriangleRenderCallback {
+    fn prepare(
+        &self,
+        _device: &wgpu::Device,
+        _queue: &wgpu::Queue,
+        _screen_descriptor: &egui_wgpu::ScreenDescriptor,
+        _egui_encoder: &mut wgpu::CommandEncoder,
+        _callback_resources: &mut egui_wgpu::CallbackResources,
+    ) -> Vec<wgpu::CommandBuffer> {
+        Vec::new()
+    }
+
+    fn paint<'a>(
+        &'a self,
+        _info: egui::PaintCallbackInfo,
+        render_pass: &mut wgpu::RenderPass<'static>,
+        _callback_resources: &'a egui_wgpu::CallbackResources,
+    ) {
+        render_pass.set_pipeline(&self.pipeline);
+        // Draw 3 hardcoded vertices defined in the WGSL shader
+        render_pass.draw(0..3, 0..1);
+    }
+}
+
 struct AppState {
     label: String,
     value: f32,
@@ -39,69 +71,150 @@ struct AppState {
 
 impl AppState {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        // Customize egui here with cc.egui_ctx.set_fonts and
-        // cc.egui_ctx.set_global_style.
-        // Restore app state using cc.storage (requires the "persistence"
-        // feature).
-        // Use the cc.gl (a glow::Context) to create graphics shaders and
-        // buffers that you can use
-        // for e.g. egui::PaintCallback.
-        Self::default()
+        let wgpu_render_state = cc
+            .wgpu_render_state
+            .as_ref()
+            .expect("eframe must be run with the wgpu backend");
+
+        let device = &wgpu_render_state.device;
+
+        // Embedded WGSL shader for a basic triangle
+        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("Triangle Shader"),
+            source: wgpu::ShaderSource::Wgsl(
+                r#"
+                struct VertexOutput {
+                    @builtin(position) clip_position: vec4<f32>,
+                    @location(0) color: vec3<f32>,
+                };
+
+                @vertex
+                fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
+                    var out: VertexOutput;
+                    var pos = array<vec2<f32>, 3>(
+                        vec2<f32>(0.0, 0.5),
+                        vec2<f32>(-0.5, -0.5),
+                        vec2<f32>(0.5, -0.5)
+                    );
+                    var colors = array<vec3<f32>, 3>(
+                        vec3<f32>(1.0, 0.2, 0.2),
+                        vec3<f32>(0.2, 1.0, 0.2),
+                        vec3<f32>(0.2, 0.2, 1.0)
+                    );
+                    out.clip_position = vec4<f32>(pos[in_vertex_index], 0.0, 1.0);
+                    out.color = colors[in_vertex_index];
+                    return out;
+                }
+
+                @fragment
+                fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+                    return vec4<f32>(in.color, 1.0);
+                }
+                "#
+                .into(),
+            ),
+        });
+
+        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: Some("Triangle Pipeline Layout"),
+            bind_group_layouts: &[],
+            immediate_size: 0,
+        });
+
+        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Triangle Render Pipeline"),
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("vs_main"),
+                buffers: &[],
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("fs_main"),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: wgpu_render_state.target_format,
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+                compilation_options: Default::default(),
+            }),
+            primitive: wgpu::PrimitiveState::default(),
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
+            multiview_mask: None,
+            cache: None,
+        });
+
+        // Register callback state into egui_wgpu paint callbacks resources
+        wgpu_render_state
+            .renderer
+            .write()
+            .callback_resources
+            .insert(TriangleRenderCallback { pipeline });
+
+        Self {
+            label: "ChemDraw Viewport".to_string(),
+            value: 0.0,
+        }
     }
 }
 
 impl eframe::App for AppState {
-    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
-        egui::Panel::top("top_panel").show_inside(ui, |ui| {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        egui::TopBottomPanel::top("top_panel").show_inside(ui, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
                         ui.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
-                ui.add_space(16.0);
                 ui.menu_button("Edit", |ui| {
                     if ui.button("Clear").clicked() {
-                        self.label = "".to_string();
+                        self.label.clear();
                     }
                 });
-                ui.add_space(16.0);
-                ui.menu_button("View", |ui| {
-                    if ui.button("Clear").clicked() {
-                        self.label = "".to_string();
-                    }
-                });
-                ui.add_space(16.0);
-                ui.menu_button("Tools", |ui| {
-                    if ui.button("Clear").clicked() {
-                        self.label = "".to_string();
-                    }
-                });
-                ui.add_space(16.0);
-                ui.menu_button("Help", |ui| {
-                    if ui.button("Clear").clicked() {
-                        self.label = "".to_string();
-                    }
-                });
-                ui.add_space(16.0);
             });
         });
 
         egui::CentralPanel::default().show_inside(ui, |ui| {
-            ui.heading(&mut self.label);
+            ui.heading(&self.label);
 
             ui.horizontal(|ui| {
-                ui.label("write something: ");
+                ui.label("Title: ");
                 ui.text_edit_singleline(&mut self.label);
             });
 
-            ui.add(egui::Slider::new(
-                &mut self.value,
-                0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                self.value += 1.0;
-            }
+            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
+
+            ui.add_space(8.0);
+            ui.label("Viewport Canvas:");
+
+            // Allocate spatial area for the wgpu render canvas
+            let (rect, _response) =
+                ui.allocate_exact_size(egui::vec2(500.0, 350.0), egui::Sense::drag());
+
+            // Add PaintCallback targeting the custom callback resource
+            ui.painter().add(egui_wgpu::Callback::new_paint_callback(
+                rect,
+                TriangleCallback,
+            ));
         });
     }
 }
 
+struct TriangleCallback;
+
+impl egui_wgpu::CallbackTrait for TriangleCallback {
+    fn paint(
+        &self,
+        info: egui::PaintCallbackInfo,
+        render_pass: &mut wgpu::RenderPass<'static>,
+        callback_resources: &egui_wgpu::CallbackResources,
+    ) {
+        if let Some(cb) = callback_resources.get::<TriangleRenderCallback>() {
+            cb.paint(info, render_pass, callback_resources);
+        }
+    }
+}

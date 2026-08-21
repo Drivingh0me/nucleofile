@@ -9,6 +9,9 @@ clap = {version = "4.5", features = ["derive"]}
 thiserror = "2.0.18"
 image = "0.25"
 
+egui-wgpu = "0.34"
+wgpu = "24.0"
+
 eframe = {version = "0.34", optional = true}
 
 [features]
