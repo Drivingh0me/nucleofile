@@ -2,10 +2,12 @@ use eframe::{egui, egui_wgpu};
 use std::sync::Arc;
 use eframe::wgpu;
 
+use crate::error::{Result, Error};
+
 // Triangle render and viewport was directly implemented with AI.
 
 // Using standard error boxing or your custom crate::error::Result
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+// type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 pub fn run_gui() -> Result<()> {
     let icon = image::load_from_memory(include_bytes!("../assets/icon.png"))
@@ -28,7 +30,7 @@ pub fn run_gui() -> Result<()> {
     };
 
     eframe::run_native(
-        "ChemDraw - wgpu Render Viewport",
+        "neucleofile - wgpu Render Viewport",
         options,
         Box::new(|cc| Ok(Box::new(AppState::new(cc)))),
     )
@@ -115,13 +117,15 @@ impl AppState {
             ),
         });
 
-        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        let pipeline_layout = device
+            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Triangle Pipeline Layout"),
             bind_group_layouts: &[],
             immediate_size: 0,
         });
 
-        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let pipeline = device
+            .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Triangle Render Pipeline"),
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
@@ -155,7 +159,7 @@ impl AppState {
             .insert(TriangleRenderCallback { pipeline });
 
         Self {
-            label: "ChemDraw Viewport".to_string(),
+            label: "Structure Viewport".to_string(),
             value: 0.0,
         }
     }
@@ -163,7 +167,7 @@ impl AppState {
 
 impl eframe::App for AppState {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        egui::TopBottomPanel::top("top_panel").show_inside(ui, |ui| {
+        egui::Panel::top("top_panel").show_inside(ui, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
@@ -186,14 +190,16 @@ impl eframe::App for AppState {
                 ui.text_edit_singleline(&mut self.label);
             });
 
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
+            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0)
+                .text("value"));
 
             ui.add_space(8.0);
             ui.label("Viewport Canvas:");
 
             // Allocate spatial area for the wgpu render canvas
             let (rect, _response) =
-                ui.allocate_exact_size(egui::vec2(500.0, 350.0), egui::Sense::drag());
+                ui.allocate_exact_size(egui::vec2(500.0, 350.0),
+                egui::Sense::drag());
 
             // Add PaintCallback targeting the custom callback resource
             ui.painter().add(egui_wgpu::Callback::new_paint_callback(
