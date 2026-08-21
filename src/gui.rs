@@ -81,41 +81,9 @@ impl AppState {
         let device = &wgpu_render_state.device;
 
         // Embedded WGSL shader for a basic triangle
-        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-            label: Some("Triangle Shader"),
-            source: wgpu::ShaderSource::Wgsl(
-                r#"
-                struct VertexOutput {
-                    @builtin(position) clip_position: vec4<f32>,
-                    @location(0) color: vec3<f32>,
-                };
-
-                @vertex
-                fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
-                    var out: VertexOutput;
-                    var pos = array<vec2<f32>, 3>(
-                        vec2<f32>(0.0, 0.5),
-                        vec2<f32>(-0.5, -0.5),
-                        vec2<f32>(0.5, -0.5)
-                    );
-                    var colors = array<vec3<f32>, 3>(
-                        vec3<f32>(1.0, 0.2, 0.2),
-                        vec3<f32>(0.2, 1.0, 0.2),
-                        vec3<f32>(0.2, 0.2, 1.0)
-                    );
-                    out.clip_position = vec4<f32>(pos[in_vertex_index], 0.0, 1.0);
-                    out.color = colors[in_vertex_index];
-                    return out;
-                }
-
-                @fragment
-                fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-                    return vec4<f32>(in.color, 1.0);
-                }
-                "#
-                .into(),
-            ),
-        });
+        let shader = device.create_shader_module(
+            wgpu::include_wgsl!("shaders/viewportShader.wgsl")
+        );
 
         let pipeline_layout = device
             .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
