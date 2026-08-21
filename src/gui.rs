@@ -37,11 +37,12 @@ pub fn run_gui() -> Result<()> {
     .map_err(|e| e.into())
 }
 
-// Custom wgpu callback structure stored in egui Resources
+// AI generated struct - unvalidated
 struct TriangleRenderCallback {
     pipeline: wgpu::RenderPipeline,
 }
 
+// AI generated impl - unvalidated
 impl egui_wgpu::CallbackTrait for TriangleRenderCallback {
     fn prepare(
         &self,
@@ -85,6 +86,7 @@ impl AppState {
             wgpu::include_wgsl!("shaders/viewportShader.wgsl")
         );
 
+        // AI generated device - unvalidated
         let pipeline_layout = device
             .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Triangle Pipeline Layout"),
@@ -92,6 +94,7 @@ impl AppState {
             immediate_size: 0,
         });
 
+        // AI generated pipeline - unvalidated
         let pipeline = device
             .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Triangle Render Pipeline"),
@@ -180,6 +183,7 @@ impl eframe::App for AppState {
 
 struct TriangleCallback;
 
+// AI generated impl - unvalidated
 impl egui_wgpu::CallbackTrait for TriangleCallback {
     fn paint(
         &self,
