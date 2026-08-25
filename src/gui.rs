@@ -5,7 +5,8 @@ use wgpu::util::DeviceExt;
 
 use crate::error::{Result, Error};
 
-// GPU representation of the uniform data (must align to 16 bytes for WGSL structs)
+// GPU representation of the uniform data 
+// (must align to 16 bytes for WGSL structs)
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 struct Uniforms {
@@ -64,14 +65,16 @@ impl AppState {
 
         // 1. Create uniform buffer
         let initial_uniforms = Uniforms { angle: 0.0, _padding: [0.0; 3] };
-        let uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        let uniform_buffer = device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Triangle Uniform Buffer"),
             contents: bytemuck::bytes_of(&initial_uniforms),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
 
         // 2. Create bind group layout
-        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        let bind_group_layout = device
+            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Triangle Bind Group Layout"),
             entries: &[wgpu::BindGroupLayoutEntry {
                 binding: 0,
@@ -100,13 +103,15 @@ impl AppState {
             wgpu::include_wgsl!("shaders/viewportShader.wgsl")
         );
 
-        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        let pipeline_layout = device
+            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Triangle Pipeline Layout"),
             bind_group_layouts: &[Some(&bind_group_layout)],
             immediate_size: 0,
         });
 
-        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let pipeline = device
+            .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Triangle Render Pipeline"),
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
@@ -176,7 +181,9 @@ impl eframe::App for AppState {
             });
 
             // Angle slider in radians (0.0 to ~6.28 for full revolution)
-            ui.add(egui::Slider::new(&mut self.angle, 0.0..=std::f32::consts::TAU)
+            ui.add(egui::Slider::new(
+                &mut self.angle, 0.0..=std::f32::consts::TAU
+            )
                 .text("angle (rad)"));
 
             ui.add_space(8.0);
@@ -209,13 +216,16 @@ impl egui_wgpu::CallbackTrait for TriangleCallback {
         _egui_encoder: &mut wgpu::CommandEncoder,
         callback_resources: &mut egui_wgpu::CallbackResources,
     ) -> Vec<wgpu::CommandBuffer> {
-        // Retrieve resources and write updated angle to the uniform buffer before painting
-        if let Some(resources) = callback_resources.get_mut::<TriangleRenderResources>() {
+        // Retrieve resources and write updated angle to the uniform buffer 
+        // before painting
+        if let Some(resources) = callback_resources
+            .get_mut::<TriangleRenderResources>() {
             let data = Uniforms {
                 angle: self.angle,
                 _padding: [0.0; 3],
             };
-            queue.write_buffer(&resources.uniform_buffer, 0, bytemuck::bytes_of(&data));
+            queue.write_buffer(
+                &resources.uniform_buffer, 0, bytemuck::bytes_of(&data));
         }
         Vec::new()
     }
@@ -226,7 +236,8 @@ impl egui_wgpu::CallbackTrait for TriangleCallback {
         render_pass: &mut wgpu::RenderPass<'static>,
         callback_resources: &'a egui_wgpu::CallbackResources,
     ) {
-        if let Some(resources) = callback_resources.get::<TriangleRenderResources>() {
+        if let Some(resources) = callback_resources
+            .get::<TriangleRenderResources>() {
             render_pass.set_pipeline(&resources.pipeline);
             render_pass.set_bind_group(0, &resources.bind_group, &[]);
             render_pass.draw(0..3, 0..1);
