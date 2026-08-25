@@ -1,13 +1,17 @@
 use eframe::{egui, egui_wgpu};
 use std::sync::Arc;
 use eframe::wgpu;
+use wgpu::util::DeviceExt;
 
 use crate::error::{Result, Error};
 
-// Triangle render and viewport was directly implemented with AI.
-
-// Using standard error boxing or your custom crate::error::Result
-// type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+// GPU representation of the uniform data (must align to 16 bytes for WGSL structs)
+#[repr(C)]
+#[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+struct Uniforms {
+    angle: f32,
+    _padding: [f32; 3], // Align struct to 16-byte boundary
+}
 
 pub fn run_gui() -> Result<()> {
     let icon = image::load_from_memory(include_bytes!("../assets/icon.png"))
@@ -25,51 +29,28 @@ pub fn run_gui() -> Result<()> {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([800.0, 600.0])
             .with_icon(Arc::new(icon)),
-        renderer: eframe::Renderer::Wgpu, // Force wgpu backend
+        renderer: eframe::Renderer::Wgpu,
         ..Default::default()
     };
 
     eframe::run_native(
-        "neucleofile - wgpu Render Viewport",
+        "nucleofile - wgpu Render Viewport",
         options,
         Box::new(|cc| Ok(Box::new(AppState::new(cc)))),
     )
     .map_err(|e| e.into())
 }
 
-// AI generated struct - unvalidated
-struct TriangleRenderCallback {
+// Stores pipeline and GPU uniform resources inside egui callback resources
+struct TriangleRenderResources {
     pipeline: wgpu::RenderPipeline,
-}
-
-// AI generated impl - unvalidated
-impl egui_wgpu::CallbackTrait for TriangleRenderCallback {
-    fn prepare(
-        &self,
-        _device: &wgpu::Device,
-        _queue: &wgpu::Queue,
-        _screen_descriptor: &egui_wgpu::ScreenDescriptor,
-        _egui_encoder: &mut wgpu::CommandEncoder,
-        _callback_resources: &mut egui_wgpu::CallbackResources,
-    ) -> Vec<wgpu::CommandBuffer> {
-        Vec::new()
-    }
-
-    fn paint<'a>(
-        &'a self,
-        _info: egui::PaintCallbackInfo,
-        render_pass: &mut wgpu::RenderPass<'static>,
-        _callback_resources: &'a egui_wgpu::CallbackResources,
-    ) {
-        render_pass.set_pipeline(&self.pipeline);
-        // Draw 3 hardcoded vertices defined in the WGSL shader
-        render_pass.draw(0..3, 0..1);
-    }
+    uniform_buffer: wgpu::Buffer,
+    bind_group: wgpu::BindGroup,
 }
 
 struct AppState {
     label: String,
-    value: f32,
+    angle: f32,
 }
 
 impl AppState {
@@ -81,22 +62,51 @@ impl AppState {
 
         let device = &wgpu_render_state.device;
 
-        // Embedded WGSL shader for a basic triangle
+        // 1. Create uniform buffer
+        let initial_uniforms = Uniforms { angle: 0.0, _padding: [0.0; 3] };
+        let uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Triangle Uniform Buffer"),
+            contents: bytemuck::bytes_of(&initial_uniforms),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+
+        // 2. Create bind group layout
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: Some("Triangle Bind Group Layout"),
+            entries: &[wgpu::BindGroupLayoutEntry {
+                binding: 0,
+                visibility: wgpu::ShaderStages::VERTEX,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: false,
+                    min_binding_size: None,
+                },
+                count: None,
+            }],
+        });
+
+        // 3. Create bind group
+        let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("Triangle Bind Group"),
+            layout: &bind_group_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: uniform_buffer.as_entire_binding(),
+            }],
+        });
+
+        // 4. Create shader and pipeline layout with bind group
         let shader = device.create_shader_module(
             wgpu::include_wgsl!("shaders/viewportShader.wgsl")
         );
 
-        // AI generated device - unvalidated
-        let pipeline_layout = device
-            .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Triangle Pipeline Layout"),
-            bind_group_layouts: &[],
+            bind_group_layouts: &[Some(&bind_group_layout)],
             immediate_size: 0,
         });
 
-        // AI generated pipeline - unvalidated
-        let pipeline = device
-            .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Triangle Render Pipeline"),
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
@@ -122,16 +132,20 @@ impl AppState {
             cache: None,
         });
 
-        // Register callback state into egui_wgpu paint callbacks resources
+        // Store shared GPU resources in callback_resources
         wgpu_render_state
             .renderer
             .write()
             .callback_resources
-            .insert(TriangleRenderCallback { pipeline });
+            .insert(TriangleRenderResources {
+                pipeline,
+                uniform_buffer,
+                bind_group,
+            });
 
         Self {
             label: "Structure Viewport".to_string(),
-            value: 0.0,
+            angle: 0.0,
         }
     }
 }
@@ -161,38 +175,61 @@ impl eframe::App for AppState {
                 ui.text_edit_singleline(&mut self.label);
             });
 
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0)
-                .text("value"));
+            // Angle slider in radians (0.0 to ~6.28 for full revolution)
+            ui.add(egui::Slider::new(&mut self.angle, 0.0..=std::f32::consts::TAU)
+                .text("angle (rad)"));
 
             ui.add_space(8.0);
             ui.label("Viewport Canvas:");
 
-            // Allocate spatial area for the wgpu render canvas
-            let (rect, _response) =
-                ui.allocate_exact_size(egui::vec2(500.0, 350.0),
-                egui::Sense::drag());
+            let (rect, _response) = ui.allocate_exact_size(
+                egui::vec2(500.0, 350.0),
+                egui::Sense::drag(),
+            );
 
-            // Add PaintCallback targeting the custom callback resource
+            // Pass the current angle to the paint callback
             ui.painter().add(egui_wgpu::Callback::new_paint_callback(
                 rect,
-                TriangleCallback,
+                TriangleCallback { angle: self.angle },
             ));
         });
     }
 }
 
-struct TriangleCallback;
+struct TriangleCallback {
+    angle: f32,
+}
 
-// AI generated impl - unvalidated
 impl egui_wgpu::CallbackTrait for TriangleCallback {
-    fn paint(
+    fn prepare(
         &self,
-        info: egui::PaintCallbackInfo,
+        _device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        _screen_descriptor: &egui_wgpu::ScreenDescriptor,
+        _egui_encoder: &mut wgpu::CommandEncoder,
+        callback_resources: &mut egui_wgpu::CallbackResources,
+    ) -> Vec<wgpu::CommandBuffer> {
+        // Retrieve resources and write updated angle to the uniform buffer before painting
+        if let Some(resources) = callback_resources.get_mut::<TriangleRenderResources>() {
+            let data = Uniforms {
+                angle: self.angle,
+                _padding: [0.0; 3],
+            };
+            queue.write_buffer(&resources.uniform_buffer, 0, bytemuck::bytes_of(&data));
+        }
+        Vec::new()
+    }
+
+    fn paint<'a>(
+        &'a self,
+        _info: egui::PaintCallbackInfo,
         render_pass: &mut wgpu::RenderPass<'static>,
-        callback_resources: &egui_wgpu::CallbackResources,
+        callback_resources: &'a egui_wgpu::CallbackResources,
     ) {
-        if let Some(cb) = callback_resources.get::<TriangleRenderCallback>() {
-            cb.paint(info, render_pass, callback_resources);
+        if let Some(resources) = callback_resources.get::<TriangleRenderResources>() {
+            render_pass.set_pipeline(&resources.pipeline);
+            render_pass.set_bind_group(0, &resources.bind_group, &[]);
+            render_pass.draw(0..3, 0..1);
         }
     }
 }
