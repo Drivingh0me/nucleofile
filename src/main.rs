@@ -12,11 +12,12 @@ use error::Result;
 fn main() -> Result<()> {
     let args: cli::Params = cli::get_args()?;
 
-    #[cfg(feature = "gui")]
-    gui::run_gui()?;
-
-    #[cfg(not(feature = "gui"))]
-    interpreter::run_interpreter()?;
+    if args.interpreter {
+        interpreter::run_interpreter()?;
+    } else {
+        #[cfg(feature = "gui")]
+        gui::run_gui()?;
+    }
 
     Ok(())
 }

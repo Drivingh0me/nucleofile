@@ -5,6 +5,9 @@ use wgpu::util::DeviceExt;
 
 use crate::error::{Result, Error};
 
+// TODO: Make slider saturation instead of rotation, and
+// use click and drag to rotate triange.
+
 // GPU representation of the uniform data 
 // (must align to 16 bytes for WGSL structs)
 #[repr(C)]

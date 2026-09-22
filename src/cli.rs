@@ -23,13 +23,18 @@ struct Args {
     /// Enters debug mode
     #[arg(short, value_name = "debug mode", action = clap::ArgAction::SetTrue)]
     debug: bool,
+
+    /// Enters debug mode
+    #[arg(short, value_name = "run interpreter only",
+        action = clap::ArgAction::SetTrue)]
+    interpreter: bool,
 }
 
-// Make Resolution the struct from render.rs
 pub struct Params{
     pub res: render::Resolution,
     pub file: Option<PathBuf>,
     pub debug: bool,
+    pub interpreter: bool,
 }
 
 pub fn get_args() -> Result<Params>
@@ -62,5 +67,6 @@ pub fn get_args() -> Result<Params>
         res,
         file: args.file,
         debug: args.debug,
+        interpreter: args.interpreter,
     })
 }
