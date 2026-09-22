@@ -12,3 +12,13 @@ gaps in understanding of tools or features.
 * validated - A human has read the code, understands all aspects of it's
 execution and has found it to be sound. Some minor changes to the code
 by a human were likely done.
+
+## Eg.
+```
+//------------------------------
+// AI Generated, unvalidated.
+
+for x in 0..n {
+    println!("Hello, World!")
+}
+```

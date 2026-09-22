@@ -8,6 +8,7 @@ use crate::error::{Result, Error};
 // TODO: Make slider saturation instead of rotation, and
 // use click and drag to rotate triange.
 
+// ----------------------------------------------------------------------------
 // GPU representation of the uniform data 
 // (must align to 16 bytes for WGSL structs)
 #[repr(C)]
@@ -162,6 +163,7 @@ impl eframe::App for AppState {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         egui::Panel::top("top_panel").show_inside(ui, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
+                // Adding top menu buttons.
                 ui.menu_button("File", |ui| {
                     if ui.button("Quit").clicked() {
                         ui.send_viewport_cmd(egui::ViewportCommand::Close);
@@ -219,7 +221,7 @@ impl egui_wgpu::CallbackTrait for TriangleCallback {
         _egui_encoder: &mut wgpu::CommandEncoder,
         callback_resources: &mut egui_wgpu::CallbackResources,
     ) -> Vec<wgpu::CommandBuffer> {
-        // Retrieve resources and write updated angle to the uniform buffer 
+        // Retrieve resources and write updated angle to the uniform buffer
         // before painting
         if let Some(resources) = callback_resources
             .get_mut::<TriangleRenderResources>() {
@@ -247,3 +249,4 @@ impl egui_wgpu::CallbackTrait for TriangleCallback {
         }
     }
 }
+// ----------------------------------------------------------------------------
