@@ -207,16 +207,19 @@ impl AppState {
 
 impl eframe::App for AppState {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        egui::TopBottomPanel::top("top_panel").show_inside(ui, |ui| {
-            ui.menu_button("File", |ui| {
-                if ui.button("Quit").clicked() {
-                    ui.send_viewport_cmd(egui::ViewportCommand::Close);
-                }
-            });
-            ui.menu_button("Edit", |ui| {
-                if ui.button("Clear").clicked() {
-                    self.label.clear();
-                }
+        egui::Panel::top("top_panel").show_inside(ui, |ui| {
+            egui::MenuBar::new().ui(ui, |ui| {
+                // Adding top menu buttons.
+                ui.menu_button("File", |ui| {
+                    if ui.button("Quit").clicked() {
+                        ui.send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+                });
+                ui.menu_button("Edit", |ui| {
+                    if ui.button("Clear").clicked() {
+                        self.label.clear();
+                    }
+                });
             });
         });
 
@@ -228,10 +231,11 @@ impl eframe::App for AppState {
                 ui.text_edit_singleline(&mut self.label);
             });
 
-            // Angle slider in radians
+            // Angle slider in radians (0.0 to ~6.28 for full revolution)
             ui.add(egui::Slider::new(
                 &mut self.angle, 0.0..=std::f32::consts::TAU
-            ).text("angle (rad)"));
+            )
+                .text("angle (rad)"));
 
             ui.add_space(8.0);
             ui.label("Viewport Canvas:");
