@@ -32,7 +32,8 @@ CT_FLAGS = -Wall -Wextra
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(PLAT_OBJ)
-	$(CC) $^ $(CT_FLAGS) -o $(BUILD_DIR)/$(TARGET)
+	mkdir -p $(BUILD_DIR)/$(BIN_DIR)
+	$(CC) $^ $(CT_FLAGS) -o $(BUILD_DIR)/$(BIN_DIR)/$(TARGET)
 
 $(BUILD_DIR)/%.o: $(PLATFORM_DIR)/%.cpp
 	mkdir -p $(BUILD_DIR)
