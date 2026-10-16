@@ -9,12 +9,20 @@ INCLUDE_DIR = include
 ifeq ($(shell uname -s),Darwin)
 	PLATFORM := Darwin
 	cc := clang++
-	LDFLAGS = -framework Cocoa -framework Foundation
+
+	GLFW_INCLUDE_DIR := /opt/homebrew/opt/glfw/include
+	GLFW_LIB_DIR := /opt/homebrew/opt/glfw/lib
+	CGLM_INCLUDE_DIR := /opt/homebrew/opt/cglm/include/cglm
+
+	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR) -I$(GLFW_INCLUDE_DIR)
+	LDFLAGS = -L$(GLFW_LIB_DIR) -lglfw -ldl -framework OpenGL -framework Cocoa -framework Foundation
 endif
 
 ifeq ($(shell uname -s),Linux)
 	PLATFORM := Linux
 	cc := g++
+
+	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR)
 	LDFLAGS =
 endif
 
@@ -26,7 +34,6 @@ PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 PLAT_OBJ := $(patsubst $(PLATFORM_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(PLAT_SRC))
 
-CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR)
 CT_FLAGS = -Wall -Wextra
 
 all: $(TARGET)
