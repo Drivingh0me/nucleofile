@@ -12,7 +12,7 @@ ifeq ($(shell uname -s),Darwin)
 
 	GLFW_INCLUDE_DIR := /opt/homebrew/opt/glfw/include
 	GLFW_LIB_DIR := /opt/homebrew/opt/glfw/lib
-	CGLM_INCLUDE_DIR := /opt/homebrew/opt/cglm/include/cglm
+	# CGLM_INCLUDE_DIR := /opt/homebrew/opt/cglm/include/cglm
 
 	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR) -I$(GLFW_INCLUDE_DIR)
 	LDFLAGS = -L$(GLFW_LIB_DIR) -lglfw -ldl -framework OpenGL -framework Cocoa -framework Foundation
@@ -29,7 +29,7 @@ endif
 PLATFORM_DIR = src/platform/$(PLATFORM)
 
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.cpp)
+PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.mm)
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 PLAT_OBJ := $(patsubst $(PLATFORM_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(PLAT_SRC))
@@ -40,15 +40,15 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) $(PLAT_OBJ)
 	mkdir -p $(BUILD_DIR)/$(BIN_DIR)
-	$(CC) $^ $(CT_FLAGS) -o $(BUILD_DIR)/$(BIN_DIR)/$(TARGET)
+	$(cc) $^ $(CT_FLAGS) -o $(BUILD_DIR)/$(BIN_DIR)/$(TARGET) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(PLATFORM_DIR)/%.cpp
 	mkdir -p $(BUILD_DIR)
-	$(CC) -c $< $(CFLAGS) -o $@
+	$(cc) -c $< $(CFLAGS) -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(BUILD_DIR)
-	$(CC) -c $< $(CFLAGS) -o $@
+	$(cc) -c $< $(CFLAGS) -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)

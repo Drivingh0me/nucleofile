@@ -9,5 +9,6 @@
 namespace Gui {
     int run_gui() {
     // Run gui.
+    return 0;
     }
 }
