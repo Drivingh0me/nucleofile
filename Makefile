@@ -22,14 +22,18 @@ ifeq ($(shell uname -s),Linux)
 	PLATFORM := Linux
 	cc := g++
 
+	GLFW_INCLUDE_DIR := /opt/homebrew/opt/glfw/include
+	GLFW_LIB_DIR := /opt/homebrew/opt/glfw/lib
+
 	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR)
 	LDFLAGS =
 endif
 
 PLATFORM_DIR = src/platform/$(PLATFORM)
+# Add a way to compile .mm files.
 
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.mm)
+PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.cpp)
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 PLAT_OBJ := $(patsubst $(PLATFORM_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(PLAT_SRC))
