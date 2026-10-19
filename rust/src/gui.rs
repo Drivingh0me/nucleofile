@@ -46,21 +46,21 @@ impl Vertex {
 }
 
 pub fn run_gui() -> Result<()> {
-    let icon = image::load_from_memory(include_bytes!("../assets/icon.png"))
-        .expect("Failed to load icon path")
-        .into_rgba8();
+    // let icon = image::load_from_memory(include_bytes!("../assets/icon.png"))
+    //     .expect("Failed to load icon path")
+    //     .into_rgba8();
 
-    let (width, height) = icon.dimensions();
-    let icon = egui::IconData {
-        rgba: icon.into_raw(),
-        width,
-        height,
-    };
+    // let (width, height) = icon.dimensions();
+    // let icon = egui::IconData {
+    //     rgba: icon.into_raw(),
+    //     width,
+    //     height,
+    // };
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 600.0])
-            .with_icon(Arc::new(icon)),
+            .with_inner_size([800.0, 600.0]),
+            // .with_icon(Arc::new(icon)),
         renderer: eframe::Renderer::Wgpu,
         ..Default::default()
     };
