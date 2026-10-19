@@ -88,8 +88,7 @@ int make_shader_program(
   return 0;
 }
 
-static void framebuffer_size_callback(
-  UNUSED GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
   glViewport(0, 0, width, height);
 }
@@ -310,7 +309,7 @@ int run_simple()
 namespace Gui {
     int run_gui() {
     // Run gui.
-    status = run_simple();
+    int status = run_simple();
     return status;
     }
 }
