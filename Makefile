@@ -15,6 +15,9 @@ ifeq ($(shell uname -s),Darwin)
 	# CGLM_INCLUDE_DIR := /opt/homebrew/opt/cglm/include/cglm
 
 	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR) -I$(GLFW_INCLUDE_DIR)
+
+	MMFLAGS = -x objective-c++
+
 	LDFLAGS = -L$(GLFW_LIB_DIR) -lglfw -ldl -framework OpenGL -framework Cocoa -framework Foundation
 endif
 
@@ -22,22 +25,22 @@ ifeq ($(shell uname -s),Linux)
 	PLATFORM := Linux
 	cc := g++
 
-	GLFW_INCLUDE_DIR := /opt/homebrew/opt/glfw/include
-	GLFW_LIB_DIR := /opt/homebrew/opt/glfw/lib
-
 	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR)
-	LDFLAGS = -lglfw -ldl -lGl -lm
-	# LDFLAGS := -L$(GLFW_LIB_DIR) -lglfw -ldl -lGL -lm
+	LDFLAGS = -lglfw -ldl -lGL -lm
 endif
 
 PLATFORM_DIR = src/platform/$(PLATFORM)
 # Add a way to compile .mm files.
 
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-PLAT_SRC := $(wildcard $(PLATFORM_DIR)/*.cpp)
+PLAT_SRC_CPP := $(wildcard $(PLATFORM_DIR)/*.cpp)
+PLAT_SRC_MM := $(wildcard $(PLATFORM_DIR)/*.mm)
+PLAT_SRC := $(PLAT_SRC_CPP) $(PLAT_SRC_MM)
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
-PLAT_OBJ := $(patsubst $(PLATFORM_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(PLAT_SRC))
+PLAT_OBJ_CPP := $(patsubst $(PLATFORM_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(PLAT_SRC_CPP))
+PLAT_OBJ_MM := $(patsubst $(PLATFORM_DIR)/%.mm, $(BUILD_DIR)/%.o, $(PLAT_SRC_MM))
+PLAT_OBJ := $(PLAT_OBJ_CPP) $(PLAT_OBJ_MM)
 
 CT_FLAGS = -Wall -Wextra
 
@@ -50,6 +53,10 @@ $(TARGET): $(OBJS) $(PLAT_OBJ)
 $(BUILD_DIR)/%.o: $(PLATFORM_DIR)/%.cpp
 	mkdir -p $(BUILD_DIR)
 	$(cc) -c $< $(CFLAGS) -o $@
+
+$(BUILD_DIR)/%.o: $(PLATFORM_DIR)/%.mm
+	mkdir -p $(BUILD_DIR)
+	$(cc) -c $< $(CFLAGS) $(MMFLAGS) -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(BUILD_DIR)

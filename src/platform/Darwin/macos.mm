@@ -5,4 +5,8 @@
 
 Config set_config() {
     std::print("Config file loaded for macos");
+    Config config;
+    config.color_mode = 0;
+
+    return config;
 }
