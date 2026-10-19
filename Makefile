@@ -26,7 +26,8 @@ ifeq ($(shell uname -s),Linux)
 	GLFW_LIB_DIR := /opt/homebrew/opt/glfw/lib
 
 	CFLAGS = -std=c++23 -Wall -Wextra -I$(INCLUDE_DIR)
-	LDFLAGS =
+	LDFLAGS = -lglfw -ldl -lGl -lm
+	# LDFLAGS := -L$(GLFW_LIB_DIR) -lglfw -ldl -lGL -lm
 endif
 
 PLATFORM_DIR = src/platform/$(PLATFORM)
