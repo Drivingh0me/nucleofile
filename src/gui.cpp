@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <print>
+
+enum class Shader {
+  Frag,
+  Vert
+};
 
 static int shader_check(unsigned int shader, unsigned int type)
 {
@@ -17,6 +23,50 @@ static int shader_check(unsigned int shader, unsigned int type)
     printf("Compilation Failed: %s\n", infoLog);
   }
   return status;
+}
+
+static const char* set_default_shader(Shader shader)
+{
+  const char* frag_string = R"(#version 330 core
+    out vec4 FragColor;
+
+    in vec3 ourColor;
+    in vec2 TexCoord;
+
+    uniform sampler2D texture1;
+    uniform sampler2D texture2;
+
+    //uniform vec4 ourColor;
+
+    void main()
+    {
+      //FragColor = vec4(ourColor, 1.0);
+      FragColor = mix(
+        texture(texture1, TexCoord), 
+        texture(texture2, vec2(1.0 - TexCoord.x, TexCoord.y)), 0.2);
+
+    })";
+  const char* vert_string = R"(#version 330 core
+    layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3, aColor;
+    layout (location = 2) in vec2 aTexCoord;
+
+    out vec3 ourColor;
+    out vec2 TexCoord;
+
+    void main()
+    {
+      gl_Position = vec4(aPos, 1.0);
+      ourColor = aColor;
+      TexCoord = aTexCoord;
+    })";
+  if (shader == Shader::Frag) {
+    std::print("Setting default fragment shader.");
+    return frag_string;
+  } else {
+    std::print("Setting default vertex shader.");
+    return vert_string;
+  }
 }
 
 // Reads shader files to import.
@@ -52,7 +102,13 @@ int make_shader_program(
 {
   // vertex shader.
   const char* vertexShaderSource = read_shader_source(vertPath);
+  if (vertexShaderSource == NULL) {
+    set_default_shader(Shader::Vert);
+  }
   const char* fragmentShaderSource = read_shader_source(fragPath);
+  if (vertexShaderSource == NULL) {
+    set_default_shader(Shader::Frag);
+  }
 
   unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -241,7 +297,7 @@ int run_simple()
   glBindTexture(GL_TEXTURE_2D, texture2);
 
   data = stbi_load(
-    "src/awesomeface.png", &width, &height, &nrChannels, 0);
+    "assets/icon.png", &width, &height, &nrChannels, 0);
   if (data) {
     glTexImage2D(
       GL_TEXTURE_2D, 0, GL_RGBA, 
