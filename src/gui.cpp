@@ -61,21 +61,21 @@ static const char* set_default_shader(Shader shader)
       TexCoord = aTexCoord;
     })";
   if (shader == Shader::Frag) {
-    std::print("Setting default fragment shader.");
+    std::print("Setting default fragment shader.\n");
     return frag_string;
   } else {
-    std::print("Setting default vertex shader.");
+    std::print("Setting default vertex shader.\n");
     return vert_string;
   }
 }
 
 // Reads shader files to import.
-static const char* read_shader_source(const char* filepath)
+static const char* read_shader_source(const char* filepath, Shader shader)
 {
   FILE* file = fopen(filepath, "rb");
   if (!file) {
     printf("Failed to open shader file.\n");
-    return NULL;
+    return set_default_shader(shader);
   }
 
   fseek(file, 0, SEEK_END);
@@ -101,14 +101,8 @@ int make_shader_program(
   const char* vertPath, const char* fragPath, unsigned int* prog)
 {
   // vertex shader.
-  const char* vertexShaderSource = read_shader_source(vertPath);
-  if (vertexShaderSource == NULL) {
-    set_default_shader(Shader::Vert);
-  }
-  const char* fragmentShaderSource = read_shader_source(fragPath);
-  if (vertexShaderSource == NULL) {
-    set_default_shader(Shader::Frag);
-  }
+  const char* vertexShaderSource = read_shader_source(vertPath, Shader::Vert);
+  const char* fragmentShaderSource = read_shader_source(fragPath, Shader::Frag);
 
   unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
