@@ -10,13 +10,36 @@
 enum class Flag {
     Test,
     Silent,
-    In // Look for data from std in.
+    In, // Look for data from std in.
+    AsString, // Treat all params as a string.
+    Invalid
 };
 
 struct FlagSet {
     Flag flag;
     std::vector<std::string> params;
 };
+
+FlagSet get_short_flag(char* arg)
+{
+    FlagSet out;
+    // Find whih flag it is and return it.
+    switch (c) {
+        case 't':
+            out.flag = Flag::Test;
+        default:
+            out.flag = Flag::Invalid;
+    }
+
+    return out;
+}
+
+FlagSet get_long_flag(char* arg)
+{
+    FlagSet out;
+    // Find whih flag it is and return it.
+    return out;
+}
 
 std::vector<FlagSet> set_flags(int argc, char** argv)
 {
@@ -42,17 +65,23 @@ std::vector<FlagSet> set_flags(int argc, char** argv)
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             if (argv[i][1] == '-') {
-                // Long flag.
                 if ( argv[i][2] == '\0') {
                     // Treat all past this as string input to app.
                 }
+                // Long flag.
+                out.emplace_back(get_long_flag(argv[i]));
             }
             // Short flag.
+            out.emplace_back(get_short_flag(argv[i]));
             if (argv[i][1] == '\0') {
                 // Not a clue what that is. Return error.
             }
         } else {
             // Param for previous flag.
+            std::string param(argv[i]);
+            if (!out.empty()) {
+                out.back().params.push_back(param);
+            }
         }
     }
 
