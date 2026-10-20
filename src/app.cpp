@@ -24,7 +24,12 @@ FlagSet get_short_flag(char* arg)
 {
     FlagSet out;
     // Find whih flag it is and return it.
+    char c = arg[1];
     switch (c) {
+        case 'i':
+            out.flag = Flag::In;
+        case 's':
+            out.flag = Flag::Silent;
         case 't':
             out.flag = Flag::Test;
         default:
@@ -106,6 +111,7 @@ int run_app(int argc, char** argv)
 
     // Parse args.
     Args args(argc, argv);
+    // if args
 
     // Get user config file.
     auto config = set_config();
