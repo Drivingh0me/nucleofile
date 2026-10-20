@@ -1,17 +1,16 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include "app.hpp"
 #include "gui.hpp"
 #include "platform_specific.h"
 
-// Flag list:
-// -T/--Test = Test the app to see performance and stability.
-
 enum class Flag {
     Test,
-    Silent
+    Silent,
+    In // Look for data from std in.
 };
 
 struct FlagSet {
@@ -21,22 +20,43 @@ struct FlagSet {
 
 std::vector<FlagSet> set_flags(int argc, char** argv)
 {
+    std::vector<FlagSet> out;
+
     std::vector<int> short_flag_indexes;
     std::vector<int> long_flag_indexes;
-    // Look for short flags of short or long.
-    for (int i = 0; i < argc; i++) {
-        if (argv[argc][0] = '-') {
-            if (argv[argc][1] == '-') {
-                // Add its position to list of long flags.
-            }
-            // Add it's position to list of short flags.
+
+    char* version_flag = "--version";
+    char* help_flag = "--help";
+    // Check for --version or --help.
+    if (argc == 2) {
+        if (strcmp(argv[1], version_flag) == 0) {
+            std::print("nucleofile v0.1.2\n");
+            return out;
+        }
+        if (strcmp(argv[1], help_flag) == 0) {
+            std::print("read the docs.\n");
+            return out;
         }
     }
 
-    // Get the number of total flags and use thier positions to determine
-    // how many params there are for each flag.
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (argv[i][1] == '-') {
+                // Long flag.
+                if ( argv[i][2] == '\0') {
+                    // Treat all past this as string input to app.
+                }
+            }
+            // Short flag.
+            if (argv[i][1] == '\0') {
+                // Not a clue what that is. Return error.
+            }
+        } else {
+            // Param for previous flag.
+        }
+    }
 
-    // Convert the flags to ordered Flags and convert params to Strings.
+    return out;
 }
 
 class Args {
